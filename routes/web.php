@@ -18,10 +18,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () { return view('welcome'); });
 
-Route::get('admin', [AdminController::class, 'index'])->middleware(['is_admin', 'is_verify_email']);
+Route::get('admin', [AdminController::class, 'index'])->middleware(['is_admin']);
 
-
-Route::get('register', [AuthController::class, 'register']);
+Route::get('register', [AuthController::class, 'register'])->name('register');
 
 Route::post('register', [AuthController::class, 'postRegister']);
 
@@ -31,11 +30,19 @@ Route::post('login', [AuthController::class, 'postLogin']);
 
 Route::post('logout', [AuthController::class, 'logout']);
 
-Route::get('forgot-password', [AuthController::class, 'login'])->name('forgot-password');
+Route::get('forgot-password', [AuthController::class, 'forgotPassword'])->name('forgot-password');
+
+Route::post('forgot-password', [AuthController::class, 'postForgotPassword'])->name('forgot-password');
+
+Route::get('reset-password', [AuthController::class, 'resetPassword'])->name('user.reset-password');
+
+Route::post('reset-password', [AuthController::class, 'postResetPassword'])->name('user.reset-password');
 
 Route::get('account/verify/{token}', [AuthController::class, 'verifyAccount'])->name('user.verify'); 
 
-Route::middleware(['is_admin', 'is_verify_email'])->group(function () {
+Route::get('reset-password/verify/{token}', [AuthController::class, 'resetPassword'])->name('reset-password.verify'); 
+
+Route::middleware(['is_admin'])->group(function () {
 
     Route::group(['middleware' => 'role:admin', 'prefix' => 'admin', 'as' => 'admin.'], function() {
         Route::resource('complaint', \App\Http\Controllers\Admin\ComplaintController::class)

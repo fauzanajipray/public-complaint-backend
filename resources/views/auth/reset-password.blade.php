@@ -35,12 +35,16 @@
                                         {{ Session::get('status') }}
                                     </div>
                                 @endif
-                                <form class="user" action="{{ route('forgot-password') }}" method="Post">
+                                <form class="user" action="{{ route('user.reset-password') }}" method="Post">
                                     @csrf
+                                    <input type="text" name="user_id" value="{{ $user['id'] }}" hidden>
                                     <div class="form-group">
-                                        <input type="email" class="form-control form-control-user"
-                                            id="exampleInputEmail" aria-describedby="emailHelp"
-                                            placeholder="Enter Email Address..." name="email">
+                                        <input type="password" class="form-control form-control-user"
+                                        id="exampleInputPassword" placeholder="Password" name="password" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="password" class="form-control form-control-user"
+                                        id="exampleRepeatPassword" placeholder="Repeat Password" name="password_confirmation" required>
                                     </div>
                                     <input type="submit" class="btn btn-primary btn-user btn-block">
                                 </form>

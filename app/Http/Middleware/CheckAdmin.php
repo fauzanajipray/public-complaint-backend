@@ -19,6 +19,6 @@ class CheckAdmin
         if(session('admin')){
             return $next($request);
         }
-        return redirect('login')->with('status', 'Anda harus login terlebih dahulu!');
+        return redirect('login')->with('status', 'Mohon maaf anda bukan admin!');
     }
 }

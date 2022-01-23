@@ -14,7 +14,7 @@ class ComplaintController extends Controller
      */
     public function index()
     {
-        //
+        
     }
 
     /**

@@ -68,13 +68,20 @@ class AuthController extends Controller
         
         $requests   = $request->all();
         $data       = User::where('email', $requests['email'])->first();
-        $cek        = Hash::check($requests['password'], $data->password);
-        if ($cek) {
-            Session::put('admin', $data->email);
-            Session::put('admin_id', $data->id);
-            return redirect('admin');
+        if ($data) {
+            if (Hash::check($requests['password'], $data->password)) {
+                if ($data->is_email_verified) {
+                    Session::put('admin_id', $data->id);
+                    Session::put('admin_name', $data->name);
+                    Session::put('admin_email', $data->email);
+                    Session::put('admin_role_id', $data->role_id);
+                    return redirect('admin')->with('status', 'Selamat datang '.$data->name);
+                }
+                return redirect('login')->with('status', 'Akun Anda belum diverifikasi, silakan periksa email Anda!');
+            }
+            return redirect('login')->with('status', 'Password salah!');
         }
-        return redirect('login')->with('status', 'Gagal login!');
+        return redirect('login')->with('status', 'Email tidak ditemukan!');
     }
 
     public function logout(){
@@ -98,6 +105,58 @@ class AuthController extends Controller
             }
         }
         return redirect()->route('login')->with('status', $message);
+    }
+
+    public function forgotPassword(){
+        return view('auth.forgot-password');
+    }
+
+    public function postForgotPassword(Request $request){
+        $requests = $request->all();
+        Validator::make($requests, [
+            'email' => ['required', 'string', 'email', 'max:255'],
+        ])->validate();
+
+        $user = User::where('email', $requests['email'])->first();
+        if ($user) {
+            $verifyUser = UserVerify::where('user_id', $user->id)->first();
+            if (!$verifyUser) {
+                return redirect('login')->with('status', 'Akun Anda belum diverifikasi, silakan periksa email Anda!');
+            }
+            $token = $verifyUser['token'];
+
+            Mail::send('email.forgotPasswordEmail', ['token' => $token], function($message) use($request){
+                $message->to($request->email);
+                $message->subject('Atur Ulang Password');
+            });
+
+            return redirect('login')->with('status', 'Kami telah mengirimkan email untuk reset password, silakan periksa email Anda!');
+        }
+        return redirect('forgot-password')->with('status', 'Email tidak ditemukan!');
+    }
+
+    public function resetPassword($token){
+        $verifyUser = UserVerify::where('token', $token)->first();
+    
+        $message = 'Mohon maaf, emailmu tidak bisa di identifikasi!';
+        if(!is_null($verifyUser) ){
+            $user = User::where('id', $verifyUser->user_id)->first()->toArray();
+            return view('auth.reset-password', compact('user'));
+        }
+        return redirect('login')->with('status', $message);
+    }
+
+    public function postResetPassword(Request $request){
+        $requests = $request->all();
+        Validator::make($requests, [
+            'password' => ['required', 'string', new Password, 'confirmed'],
+        ])->validate();
+
+        $user = User::find($requests['user_id']);
+        $user->password = Hash::make($requests['password']);
+        $user->save();
+
+        return redirect('login')->with('status', 'Password berhasil diubah!');
     }
 
 }
