@@ -66,5 +66,6 @@ class Kernel extends HttpKernel
         'role' => \App\Http\Middleware\CheckRole::class,
         'is_admin' => \App\Http\Middleware\CheckAdmin::class,
         'is_verify_email' => \App\Http\Middleware\IsVerifyEmail::class,
+        'is_login' => \App\Http\Middleware\CheckLogin::class,
     ];
 }

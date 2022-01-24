@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Admin\ComplaintController as AdminComplaintController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -24,7 +25,7 @@ Route::get('register', [AuthController::class, 'register'])->name('register');
 
 Route::post('register', [AuthController::class, 'postRegister']);
 
-Route::get('login', [AuthController::class, 'login'])->name('login');
+Route::get('login', [AuthController::class, 'login'])->name('login')->middleware(['is_login']);
 
 Route::post('login', [AuthController::class, 'postLogin']);
 
@@ -44,14 +45,14 @@ Route::get('reset-password/verify/{token}', [AuthController::class, 'resetPasswo
 
 Route::middleware(['is_admin'])->group(function () {
 
-    Route::group(['middleware' => 'role:admin', 'prefix' => 'admin', 'as' => 'admin.'], function() {
+    Route::group(['prefix' => 'admin', 'as' => 'admin.'], function() {
         Route::resource('complaint', \App\Http\Controllers\Admin\ComplaintController::class)
             ->only(['index', 'show', 'destroy']);
     });
 
-    Route::group(['middleware' => 'role:user', 'prefix' => 'user', 'as' => 'user.'], function() {
-        Route::resource('complaint', \App\Http\Controllers\User\ComplaintController::class)
-            ->only(['index']);
-    });
+    // Route::group(['middleware' => 'role:user', 'prefix' => 'user', 'as' => 'user.'], function() {
+    //     Route::resource('complaint', \App\Http\Controllers\User\ComplaintController::class)
+    //         ->only(['index']);
+    // });
 
 });

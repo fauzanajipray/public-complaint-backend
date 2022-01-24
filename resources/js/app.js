@@ -1,6 +1,7 @@
 require('./bootstrap');
 require('jquery.easing');
 
+
 /*
 *
 * SB ADMIN
