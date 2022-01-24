@@ -16,7 +16,7 @@ class CheckAdmin
      */
     public function handle(Request $request, Closure $next)
     {
-        if(session('admin')){
+        if(session('admin_id')){
             return $next($request);
         }
         return redirect('login')->with('status', 'Mohon maaf anda bukan admin!');

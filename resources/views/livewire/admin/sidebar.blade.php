@@ -47,23 +47,19 @@
         </div>
     </li>
 
-    @can('manage-users', App\User::class)
     <!-- Nav Item - Tables -->
     <li class="nav-item">
         <a class="nav-link" href="tables.html">
             <i class="fas fa-fw fa-table"></i>
             <span>Super Admin</span></a>
     </li>
-    @endcan
     
-    @can('manage-complaint', App\User::class)
     <!-- Nav Item - Charts -->
     <li class="nav-item">
         <a class="nav-link" href="charts.html">
             <i class="fas fa-fw fa-chart-area"></i>
             <span>Admin</span></a>
     </li>
-    @endcan
     
     {{-- <!-- Nav Item - Tables -->
     <li class="nav-item">
