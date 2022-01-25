@@ -18,11 +18,10 @@ class CreateComplaintsTable extends Migration
             $table->foreignId('user_id')->constrained();
             $table->string('title');
             $table->string('description');
-            $table->foreignId('receiver_id')->constrained();
+            $table->foreignId('recipient_id')->constrained();
             $table->string('image');
-            $table->string('status');
             $table->string('message_status');
-            $table->string('is_private');
+            $table->boolean('is_private');
             $table->timestamps();
         });
     }

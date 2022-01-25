@@ -36,8 +36,6 @@ class AuthController extends Controller
 
         $requests['password'] = Hash::make($requests['password']);
         $requests['role_id'] = 2;
-        
-        // $requests['image'] = "";
 
         $user = User::create($requests);
         if ($user) {

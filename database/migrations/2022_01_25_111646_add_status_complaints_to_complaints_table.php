@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateReceiversTable extends Migration
+class AddStatusComplaintsToComplaintsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,8 @@ class CreateReceiversTable extends Migration
      */
     public function up()
     {
-        Schema::create('receivers', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->timestamps();
+        Schema::table('complaints', function (Blueprint $table) {
+            $table->foreignId('status_complaint_id')->constrained()->after('image')->default(1);
         });
     }
 
@@ -27,6 +25,8 @@ class CreateReceiversTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('receivers');
+        Schema::table('complaints', function (Blueprint $table) {
+            //
+        });
     }
 }

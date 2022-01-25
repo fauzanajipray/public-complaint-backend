@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Complaint;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+
+use function GuzzleHttp\Promise\all;
 
 class ComplaintController extends Controller
 {
@@ -15,7 +18,7 @@ class ComplaintController extends Controller
      */
     public function index()
     {
-        $complaints = Complaint::all();
+        $complaints = Complaint::paginate(10);
 
         return response()->json([
             'message' => 'SUCCESS',
@@ -26,16 +29,6 @@ class ComplaintController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -43,12 +36,21 @@ class ComplaintController extends Controller
      */
     public function store(Request $request)
     {
-        
+        $validator = Validator::make($request->all(), Complaint::$rules);
+
+        if (!$validator->fails()) {
+            return response()->json([
+                'message' => 'SUCCESS',
+                'status' => '200',
+                'data' => $request->all(),
+            ], 200);
+        }
+
         return response()->json([
-            'message' => 'SUCCESS',
-            'status' => '200',
-            'data' => $request->all(),
-        ], 200);
+            'message' => 'VALIDATION_ERROR',
+            'status' => '401',
+            'data' => $validator->errors(),
+        ], 401);
 
     }
 

@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 Route::group(['middleware' => 'auth:sanctum'], function () {
+
+    Route::get('logout', [AuthController::class, 'logout']);
     
     Route::post('complaints', [ComplaintController::class, 'store']);
     Route::get('complaints', [ComplaintController::class, 'index']);
@@ -23,3 +25,5 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 });
 
 Route::post('login', [AuthController::class, 'login']);
+
+Route::post('register', [AuthController::class, 'register']);
