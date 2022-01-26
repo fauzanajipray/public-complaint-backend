@@ -19,8 +19,8 @@ class AuthController extends Controller
     public function login(Request $request){
 
         $validator = Validator::make($request->all(), [
-            'email' => ['required','email'],
-            'password' => ['required'],
+            'email' => ['required','email','exists:users,email'],
+            'password' => ['required', 'string', 'min:8'],
         ]);
         
         if (!$validator->fails()){
@@ -30,9 +30,9 @@ class AuthController extends Controller
             if (!$user || !Hash::check($request->password, $user->password)) {
                 return response()->json([
                     'status' => 401,
-                    'message' => 'Email atau password salah.',
+                    'message' => 'Validasi gagal.',
                     'errors' => [
-                        'email' => ['Email atau password salah.']
+                        'password' => ['Password salah.']
                     ]
                 ], 401);
             }
