@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Complaint;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 use function GuzzleHttp\Promise\all;
 
@@ -18,14 +20,20 @@ class ComplaintController extends Controller
      */
     public function index()
     {
-        $complaints = Complaint::paginate(10);
-
-        return response()->json([
-            'message' => 'SUCCESS',
-            'status' => '200',
-            'data' => $complaints,
-        ], 200);
-
+        try {
+            $complaints = Complaint::paginate(10);
+            return response()->json([
+                'message' => 'SUCCESS',
+                'status' => '200',
+                'data' => $complaints,
+            ], 200);
+        } catch (QueryException $e) {
+            return response()->json([
+                'status' => '500',
+                'message' => 'ERROR',
+                'data' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**
@@ -34,24 +42,50 @@ class ComplaintController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
-    {
-        $validator = Validator::make($request->all(), Complaint::$rules);
+    
+    public function store(Request $request) {
+        $complaint = $request->all();
+        $validator = Validator::make($complaint, Complaint::$rules);
 
         if (!$validator->fails()) {
+            if ($request->hasFile('image')) {
+
+                $file = $request->file('image');
+
+                $date = date('Ymd').'_'.date('His');
+                $filename = $date . '_' . random_int(1000, 9999) . '.' . $file->getClientOriginalExtension();
+                $destinationPath = "storage/complaint/";
+                $file->move($destinationPath, $filename);
+                $complaint['image'] = url('/') . '/' . $destinationPath . $filename;
+            }
+
+            $complaint['message_status'] = 1 ;
+
+            if(Complaint::create($complaint)){
+                return response()->json([
+                    'status' => 200,
+                    'message' => 'SUCCESS',
+                    'data' => $complaint,
+                    'error' => null,
+                ], 200);
+            } 
+
             return response()->json([
-                'message' => 'SUCCESS',
-                'status' => '200',
-                'data' => $request->all(),
-            ], 200);
+                'status' => 500,
+                'message' => 'FAILED',
+                'data' => $complaint,
+                'errors' => [
+                    'message' => 'Internal Server Error',
+                ],
+            ], 500);
         }
 
         return response()->json([
             'message' => 'VALIDATION_ERROR',
             'status' => '401',
-            'data' => $validator->errors(),
+            'data' => null,
+            'errors' => $validator->errors(),
         ], 401);
-
     }
 
     /**
@@ -62,7 +96,25 @@ class ComplaintController extends Controller
      */
     public function show($id)
     {
-        //
+        $complaint = Complaint::find($id);
+
+        if ($complaint) {
+            return response()->json([
+                'status' => 200,
+                'message' => 'SUCCESS',
+                'data' => $complaint,
+                'error' => null,
+            ], 200);
+        }
+
+        return response()->json([
+            'status' => 404,
+            'message' => 'NOT_FOUND',
+            'data' => null,
+            'errors' => [
+                'message' => 'Data not found',
+            ],
+        ], 404);
     }
 
     /**
@@ -73,7 +125,7 @@ class ComplaintController extends Controller
      */
     public function edit($id)
     {
-        //
+        
     }
 
     /**
@@ -84,8 +136,53 @@ class ComplaintController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
-    {
-        //
+    {    
+        $complaint = $request->all();
+        $validator = Validator::make($complaint, Complaint::$rules);
+
+        if (!$validator->fails()) {
+
+            try {
+                $complaint = Complaint::find($id);
+
+                if ($request->hasFile('image')) {
+                    $file = $request->file('image');
+                    $date = date('Ymd').'_'.date('His');
+                    $filename = $date . '_' . random_int(1000, 9999) . '.' . $file->getClientOriginalExtension();
+                    $destinationPath = "storage/complaint/";
+                    $file->move($destinationPath, $filename);
+                    $complaint['image'] = url('/') . '/' . $destinationPath . $filename;
+                }
+    
+                if($complaint->update($complaint)){
+                    return response()->json([
+                        'status' => 200,
+                        'message' => 'SUCCESS',
+                        'data' => $complaint,
+                        'error' => null,
+                    ], 200);
+                } 
+
+            } catch (QueryException $q) {
+                if (!$complaint) {
+                    return response()->json([
+                        'status' => 404,
+                        'message' => 'NOT_FOUND',
+                        'data' => null,
+                        'errors' => [
+                            'message' => $q->getMessage(),
+                        ],
+                    ], 404);
+                }
+            }
+        }
+
+        return response()->json([
+            'message' => 'VALIDATION_ERROR',
+            'status' => '401',
+            'data' => null,
+            'errors' => $validator->errors(),
+        ], 401);
     }
 
     /**
@@ -96,6 +193,31 @@ class ComplaintController extends Controller
      */
     public function destroy($id)
     {
-        //
+        try {
+            $complaint = Complaint::find($id);
+            if ($complaint) {
+                $complaint->delete();
+                return response()->json([
+                    'status' => 200,
+                    'message' => 'SUCCESS',
+                    'data' => null,
+                    'error' => null,
+                ], 200);
+            }
+            return response()->json([
+                'status' => 404,
+                'message' => 'NOT_FOUND',
+                'data' => null,
+                'errors' => [
+                    'message' => 'Data not found',
+                ],
+            ], 404);    
+        } catch (QueryException $e) {
+            return response()->json([
+                'status' => 500,
+                'message' => 'ERROR',
+                'data' => $e->getMessage(),
+            ], 500);
+        }
     }
 }

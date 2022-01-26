@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ComplaintController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use phpDocumentor\Reflection\Types\Resource_;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,9 +20,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
     Route::get('logout', [AuthController::class, 'logout']);
     
-    Route::post('complaints', [ComplaintController::class, 'store']);
-    Route::get('complaints', [ComplaintController::class, 'index']);
-    
+    Route::resource('complaints', ComplaintController::class)->except(['create', 'edit']);
 });
 
 Route::post('login', [AuthController::class, 'login']);
