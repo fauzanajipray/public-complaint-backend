@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\Complaint;
 use App\Models\Recipient;
 use App\Models\Role;
-use App\Models\StatusComplaint;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
     {
         Role::create(['name' => 'Admin']);
         Role::create(['name' => 'User']);
+        Role::create(['name' => 'Staff']);
 
         Recipient::create(['name' => 'Kepala Desa']);
         Recipient::create(['name' => 'Kepala Dusun Karangrejo']);
@@ -26,11 +27,7 @@ class DatabaseSeeder extends Seeder
         Recipient::create(['name' => 'Kepala Dusun Karangnongko']);
         Recipient::create(['name' => 'Kepala Dusun Brangkal']);
 
-        StatusComplaint::create(['status' => 'Menunggu']);
-        StatusComplaint::create(['status' => 'Diproses']);
-        StatusComplaint::create(['status' => 'Selesai']);
-        StatusComplaint::create(['status' => 'Batal']);
-        
         User::factory(5)->create();
+        Complaint::factory(25)->create();
     }
 }

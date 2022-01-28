@@ -14,9 +14,9 @@ class Complaint extends Model
         'title',
         'description',
         'recipient_id',
-        'image',  
-        'status_complaint_id',      
-        'message_status',
+        'image',    
+        'status',
+        'is_anonymous',
         'is_private',
     ];
 
@@ -26,9 +26,49 @@ class Complaint extends Model
         'description' => 'required|string',
         'recipient_id' => 'required|integer',
         'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-        'status_complaint_id' => 'required|integer',
-        'message_status' => 'string|max:255',
+        'status' => 'string|max:255',
+        'is_anonymous' => 'required|boolean',
         'is_private' => 'required|boolean',
     ];
     
+    public function scopePrivate($query)
+    {   
+        if (isset(request()->private)) {
+            return $query->where('is_private', request()->private);
+        }
+    }
+
+    public function scopeAnonymous($query)
+    {
+        if (isset(request()->anonymous)) {
+            return $query->where('is_anonymous', request()->anonymous);
+        }
+    }
+
+    public function scopeUserId($query)
+    {
+        if (isset(request()->user_id)) {
+            return $query->where('user_id', request()->user_id);
+        }
+    }
+
+    public function scopeSearch($query)
+    {
+        if (isset(request()->search)) {
+            return $query->where('title', 'like', '%'.request()->search.'%')
+                        ->orWhere('description', 'like', '%'.request()->search.'%');
+        }
+    }
+
+    public function scopeStatus($query)
+    {
+        if (isset(request()->status)) {
+            return $query->where('status', request()->status);
+        }
+    }
+    
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

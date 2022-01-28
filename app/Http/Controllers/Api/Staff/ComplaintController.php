@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\Staff;
 
 use App\Http\Controllers\Controller;
 use App\Models\Complaint;
@@ -18,8 +18,9 @@ class ComplaintController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
-    {
+    public function index(Request $request)
+    {   
+            
         try {
             $complaints = Complaint::paginate(10);
             return response()->json([
@@ -201,6 +202,37 @@ class ComplaintController extends Controller
                     'status' => 200,
                     'message' => 'SUCCESS',
                     'data' => null,
+                    'error' => null,
+                ], 200);
+            }
+            return response()->json([
+                'status' => 404,
+                'message' => 'NOT_FOUND',
+                'data' => null,
+                'errors' => [
+                    'message' => 'Data not found',
+                ],
+            ], 404);    
+        } catch (QueryException $e) {
+            return response()->json([
+                'status' => 500,
+                'message' => 'ERROR',
+                'data' => $e->getMessage(),
+            ], 500);
+        }
+    }
+    
+    public function whereStatus(Request $request)
+    {
+        try {
+            dd($request->all());
+            $status = 1;
+            $complaints = Complaint::where('status', $status)->get();
+            if ($complaints) {
+                return response()->json([
+                    'status' => 200,
+                    'message' => 'SUCCESS',
+                    'data' => $complaints,
                     'error' => null,
                 ], 200);
             }

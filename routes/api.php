@@ -1,7 +1,8 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\Api\ComplaintController;
+use App\Http\Controllers\Api\User\ComplaintController as UserComplaintController;
+use App\Http\Controllers\Api\Staff\ComplaintController as StaffComplaintController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use phpDocumentor\Reflection\Types\Resource_;
@@ -20,7 +21,16 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
     Route::get('logout', [AuthController::class, 'logout']);
     
-    Route::resource('complaints', ComplaintController::class)->except(['create', 'edit']);
+    // make route group prefix user
+    Route::group(['prefix' => 'user'], function () {
+        Route::resource('complaints', UserComplaintController::class);
+    });
+    
+    // make route group prefix staff
+    Route::group(['prefix' => 'staff'], function () {
+        Route::resource('complaints', StaffComplaintController::class);
+    });
+
 });
 
 Route::post('login', [AuthController::class, 'login']);

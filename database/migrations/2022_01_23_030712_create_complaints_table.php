@@ -20,7 +20,8 @@ class CreateComplaintsTable extends Migration
             $table->string('description');
             $table->foreignId('recipient_id')->constrained();
             $table->string('image');
-            $table->string('message_status');
+            $table->string('status')->default('Menunggu'); // Menunggu, Diterima, Ditolak
+            $table->boolean('is_anonymous');
             $table->boolean('is_private');
             $table->timestamps();
         });

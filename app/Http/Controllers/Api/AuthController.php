@@ -37,6 +37,14 @@ class AuthController extends Controller
                 ], 401);
             }
 
+            if($user->is_email_verified == 0){
+                return response()->json([
+                    'status' => 401,
+                    'message' => 'Akun Anda belum diverifikasi, silakan periksa email Anda!',
+                    'errors' => null,
+                ], 401);
+            }
+
             $token = $user->createToken('token-name')->plainTextToken;
 
             return response()->json([

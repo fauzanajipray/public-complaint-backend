@@ -47,7 +47,6 @@ class AuthController extends Controller
                 'token' => $token
             ]);
 
-            
             Mail::send('email.emailVerificationEmail', ['token' => $token], function($message) use($request){
                 $message->to($request->email);
                 $message->subject('Email Verification Mail');
@@ -75,7 +74,8 @@ class AuthController extends Controller
                     Session::put('admin_role_id', $data->role_id);
                     return redirect('admin')->with('status', 'Selamat datang '.$data->name);
                 }
-                return redirect('login')->with('status', 'Akun Anda belum diverifikasi, silakan periksa email Anda!');
+                return redirect('login')->with('status', 'Akun Anda belum diverifikasi, 
+                silakan periksa email Anda!');
             }
             return redirect('login')->with('status', 'Password salah!');
         }
