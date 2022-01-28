@@ -17,14 +17,14 @@ class ComplaintController extends Controller
      */
     public function index(Request $request)
     {    
-
+        dd($request);
         try {
             $complaints = Complaint::private()
                             ->anonymous()
                             ->userId()
                             ->search()
                             ->status()
-                            ->get();
+                            ->paginate(10);
 
             return response()->json([
                 'message' => 'SUCCESS',
