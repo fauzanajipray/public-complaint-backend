@@ -16,18 +16,14 @@ class ComplaintController extends Controller
      */
     public function index(Request $request)
     {   
-        $complaints = Complaint::orderBy('created_at', 'DESC');
-
-        // dd($complaints->user->get());
+        $complaints = Complaint::joinUser()->joinRecipient()->select('complaints.*', 'users.name as user_name', 'recipients.name as recipient_name')->orderBy('created_at', 'DESC');
 
         $data['complaints'] = $complaints->private()
                                         ->search()
                                         ->recipient()
                                         ->status()
                                         ->orderByDate()
-                                        ->leftJoin('users', 'users.id', '=', 'complaints.user_id')
                                         ->get();
-        dd($data['complaints']->all());
         $data['recipients'] = Recipient::all();
         $requests = $request;
         return view('admin.complaint.index', compact('data', 'requests'));

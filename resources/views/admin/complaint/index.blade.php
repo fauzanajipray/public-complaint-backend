@@ -46,9 +46,9 @@
                                     <label for="status">Status</label>
                                     <select class="custom-select" name="status">
                                         <option value="">Pilih Status</option>
-                                        <option value="Menunggu">Menunggu</option>
-                                        <option value="Diterima">Diterima</option>
-                                        <option value="Ditolak">Ditolak</option>
+                                        <option value="Menunggu" {{ ($requests->status == "Menunggu") ? "selected" : '' }}>Menunggu</option>
+                                        <option value="Diterima" {{ ($requests->status == "Diterima") ? "selected" : '' }}>Diterima</option>
+                                        <option value="Ditolak" {{ ($requests->status == "Ditolak") ? "selected" : '' }}>Ditolak</option>
                                     </select>
                                 </div>
                                 <div class="form-group col-md-3">
@@ -56,17 +56,15 @@
                                     <select class="custom-select" id="recipient" name="recipient">
                                         <option value="">Pilih Penerima</option>
                                         @foreach ($data['recipients'] as $recipient)
-                                        <option value="{{ $recipient->id }}">{{ $recipient->name }}</option>    
+                                        <option value="{{ $recipient->id }}" {{ ($requests->recipient == $recipient->id) ? "selected" : '' }}>{{ $recipient->name }}</option>    
                                         @endforeach
                                     </select>
                                 </div>
                                 <div class="form-group col-md-3">
                                     <label for="order">Urutkan</label>
                                     <select class="custom-select" name="order">
-                                        {{-- <option value="ASC" {{ ($request->order == 'ASC') ? "selected" : "" }} >Terbaru</option>
-                                        <option value="DESC" {{ ($request->order == 'DESC') ? "selected" : "" }} >Terlama</option> --}}
-                                        <option value="DESC">Terbaru</option>
-                                        <option value="DESC">Terlama</option>
+                                        <option value="DESC" {{ ($requests->order == 'DESC') ? "selected" : '' }} >Terbaru</option>
+                                        <option value="ASC" {{ ($requests->order == 'ASC') ? "selected" : '' }} >Terlama</option>
                                     </select>
                                 </div>
                                 <div class="form-group col-md-12">
@@ -80,33 +78,61 @@
                             <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                                 <thead>
                                     <tr>
-                                        <th>Title</th>
-                                        <th>Description</th>
+                                        <th>Judul</th>
+                                        <th>Deskripsi</th>
                                         <th>Pengaju</th>
                                         <th>Penerima</th>
-                                        <th>Anonymous</th>
-                                        <th>Private</th>
+                                        <th>Anonim</th>
+                                        <th>Privasi</th>
+                                        <th>Aksi</th>
                                     </tr>
                                 </thead>
                                 <tfoot>
                                     <tr>
-                                        <th>Title</th>
-                                        <th>Description</th>
+                                        <th>Judul</th>
+                                        <th>Deskripsi</th>
                                         <th>Pengaju</th>
                                         <th>Penerima</th>
-                                        <th>Anonymous</th>
-                                        <th>Private</th>
+                                        <th>Anonim</th>
+                                        <th>Privasi</th>
+                                        <th>Aksi</th>
                                     </tr>
                                 </tfoot>
                                 <tbody>
                                     @foreach ($data['complaints'] as $complaint)
                                     <tr>
-                                        <td>{{$complaint->title}}</td>
-                                        <td>{{$complaint->description}}</td>
-                                        <td>{{$complaint->user_id}}</td>
-                                        <td>{{$complaint->recipient_id}}</td>
-                                        <td>{{$complaint->is_anonymous}}</td>
-                                        <td>{{$complaint->is_private}}</td>
+                                        <td>{{ $complaint->title }}</td>
+                                        <td>
+                                            <?php
+                                             if (strlen($complaint->description) < 100) {
+                                                echo $complaint->description;
+                                            } else {
+                                                echo substr($complaint->description, 0, 100) . '....';
+                                            }
+                                            ?>
+                                        </td>
+                                        <td>{{ $complaint->user_name }}</td>
+                                        <td>{{ $complaint->recipient_name }}</td>
+                                        <td>{{ ($complaint->is_anonymous == 1) ? 'Yes' :'No' }}</td>
+                                        <td>{{ ($complaint->is_private == 1) ? 'Yes' : 'No' }} </td>
+                                        <td>
+                                            <a href="{{ url('admin/complaint/'.$complaint->id) }}" 
+                                                class="btn btn-primary btn-sm mb-1">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{{ url('admin/complaint/'.$complaint->id.'/edit') }}" 
+                                                class="btn btn-warning btn-sm mb-1" hidden>
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <form action="{{ url('admin/complaint/'.$complaint->id) }}" method="post" class="d-inline">
+                                                @csrf
+                                                @method('delete')
+                                                <button type="submit" class="btn btn-danger btn-sm mb-1">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+
+                                        </td>
                                     </tr>
                                     @endforeach
                                 </tbody>
@@ -143,7 +169,10 @@
 </a>
 
 <!-- Logout Modal-->
-<@livewire('admin.logout-modal')
+@livewire('admin.logout-modal')
+@livewire('admin.show-complaint-modal', [
+    'com' => $user,
+])
 
 @endsection
 

@@ -81,6 +81,18 @@ class Complaint extends Model
         }
     }
 
+    public function scopeJoinUser($query)
+    {
+        return $query->join('users', 'users.id', '=', 'complaints.user_id')
+                    ->select('complaints.*', 'users.name as user_name');
+    }
+
+    public function scopeJoinRecipient($query)
+    {
+        return $query->join('recipients', 'recipients.id', '=', 'complaints.recipient_id')
+                    ->select('complaints.*', 'recipients.name as recipient_name');
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);
