@@ -66,7 +66,21 @@ class Complaint extends Model
             return $query->where('status', request()->status);
         }
     }
-    
+
+    public function scopeRecipient($query)
+    {
+        if (isset(request()->recipient)) {
+            return $query->where('recipient_id', request()->recipient);
+        }
+    }
+
+    public function scopeOrderByDate($query)
+    {
+        if (isset(request()->order)) {
+            return $query->orderBy('created_at', request()->order);
+        }
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);

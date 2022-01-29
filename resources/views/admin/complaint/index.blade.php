@@ -35,35 +35,78 @@
                 <!-- DataTales Example -->
                 <div class="card shadow mb-4">
                     <div class="card-header py-3">
-                        <h6 class="m-0 font-weight-bold text-primary">DataTables Example</h6>
+                        <form action="{{ url('admin/complaint') }}" method="get">
+                            <div class="row">
+                                <div class="form-group col-md-3">
+                                    <label for="search">Pencarian</label>
+                                    <input type="text" class="form-control" id="search" name="search" 
+                                    placeholder="Cari judul, detail.." value="{{ ($requests->search) ? $requests->search : '' }}">
+                                </div>
+                                <div class="form-group col-md-3">
+                                    <label for="status">Status</label>
+                                    <select class="custom-select" name="status">
+                                        <option value="">Pilih Status</option>
+                                        <option value="Menunggu">Menunggu</option>
+                                        <option value="Diterima">Diterima</option>
+                                        <option value="Ditolak">Ditolak</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-md-3">
+                                    <label for="recipient">Penerima</label>
+                                    <select class="custom-select" id="recipient" name="recipient">
+                                        <option value="">Pilih Penerima</option>
+                                        @foreach ($data['recipients'] as $recipient)
+                                        <option value="{{ $recipient->id }}">{{ $recipient->name }}</option>    
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="form-group col-md-3">
+                                    <label for="order">Urutkan</label>
+                                    <select class="custom-select" name="order">
+                                        {{-- <option value="ASC" {{ ($request->order == 'ASC') ? "selected" : "" }} >Terbaru</option>
+                                        <option value="DESC" {{ ($request->order == 'DESC') ? "selected" : "" }} >Terlama</option> --}}
+                                        <option value="DESC">Terbaru</option>
+                                        <option value="DESC">Terlama</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-md-12">
+                                    <button type="submit" class="btn btn-primary btn-block">Cari</button>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
                             <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                                 <thead>
                                     <tr>
-                                        <th>Name</th>
-                                        <th>Position</th>
-                                        <th>Office</th>
-                                        <th>Age</th>
-                                        <th>Start date</th>
-                                        <th>Salary</th>
+                                        <th>Title</th>
+                                        <th>Description</th>
+                                        <th>Pengaju</th>
+                                        <th>Penerima</th>
+                                        <th>Anonymous</th>
+                                        <th>Private</th>
                                     </tr>
                                 </thead>
                                 <tfoot>
                                     <tr>
-                                        <th>Name</th>
-                                        <th>Position</th>
-                                        <th>Office</th>
-                                        <th>Age</th>
-                                        <th>Start date</th>
-                                        <th>Salary</th>
+                                        <th>Title</th>
+                                        <th>Description</th>
+                                        <th>Pengaju</th>
+                                        <th>Penerima</th>
+                                        <th>Anonymous</th>
+                                        <th>Private</th>
                                     </tr>
                                 </tfoot>
                                 <tbody>
                                     @foreach ($data['complaints'] as $complaint)
                                     <tr>
-                                        <td></td>
+                                        <td>{{$complaint->title}}</td>
+                                        <td>{{$complaint->description}}</td>
+                                        <td>{{$complaint->user_id}}</td>
+                                        <td>{{$complaint->recipient_id}}</td>
+                                        <td>{{$complaint->is_anonymous}}</td>
+                                        <td>{{$complaint->is_private}}</td>
                                     </tr>
                                     @endforeach
                                 </tbody>

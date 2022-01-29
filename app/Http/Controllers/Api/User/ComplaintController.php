@@ -4,8 +4,11 @@ namespace App\Http\Controllers\Api\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\Complaint;
+use App\Models\User;
+use App\Models\UserVerify;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class ComplaintController extends Controller
@@ -17,10 +20,9 @@ class ComplaintController extends Controller
      */
     public function index(Request $request)
     {    
-        dd($request);
+        
         try {
-            $complaints = Complaint::private()
-                            ->anonymous()
+            $complaints = Complaint::private()->anonymous()
                             ->userId()
                             ->search()
                             ->status()
