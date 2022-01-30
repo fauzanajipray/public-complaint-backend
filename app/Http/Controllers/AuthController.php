@@ -68,11 +68,14 @@ class AuthController extends Controller
         if ($data) {
             if (Hash::check($requests['password'], $data->password)) {
                 if ($data->is_email_verified) {
-                    Session::put('admin_id', $data->id);
-                    Session::put('admin_name', $data->name);
-                    Session::put('admin_email', $data->email);
-                    Session::put('admin_role_id', $data->role_id);
-                    return redirect('admin')->with('status', 'Selamat datang '.$data->name);
+                    if($data->role_id == 1){
+                        Session::put('admin_id', $data->id);
+                        Session::put('admin_name', $data->name);
+                        Session::put('admin_email', $data->email);
+                        Session::put('admin_role_id', $data->role_id);
+                        return redirect('admin')->with('status', 'Selamat datang '.$data->name);
+                    }
+                    return redirect('login')->with('status', 'Anda tidak memiliki akses!');
                 }
                 return redirect('login')->with('status', 'Akun Anda belum diverifikasi, 
                 silakan periksa email Anda!');

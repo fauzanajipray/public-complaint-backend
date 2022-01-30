@@ -52,11 +52,11 @@
                                     </select>
                                 </div>
                                 <div class="form-group col-md-3">
-                                    <label for="recipient">Penerima</label>
-                                    <select class="custom-select" id="recipient" name="recipient">
+                                    <label for="position">Penerima</label>
+                                    <select class="custom-select" id="position" name="position">
                                         <option value="">Pilih Penerima</option>
-                                        @foreach ($data['recipients'] as $recipient)
-                                        <option value="{{ $recipient->id }}" {{ ($requests->recipient == $recipient->id) ? "selected" : '' }}>{{ $recipient->name }}</option>    
+                                        @foreach ($data['positions'] as $position)
+                                        <option value="{{ $position->id }}" {{ ($requests->position == $position->id) ? "selected" : '' }}>{{ $position->name }}</option>    
                                         @endforeach
                                     </select>
                                 </div>
@@ -101,23 +101,31 @@
                                 <tbody>
                                     @foreach ($data['complaints'] as $complaint)
                                     <tr>
-                                        <td>{{ $complaint->title }}</td>
+                                        <td><?php
+                                            if (strlen($complaint->titlen) < 50) {
+                                               echo $complaint->title;
+                                           } else {
+                                               echo substr($complaint->title, 0, 50) . '....';
+                                           }
+                                           ?></td>
                                         <td>
                                             <?php
-                                             if (strlen($complaint->description) < 100) {
+                                             if (strlen($complaint->description) < 50) {
                                                 echo $complaint->description;
                                             } else {
-                                                echo substr($complaint->description, 0, 100) . '....';
+                                                echo substr($complaint->description, 0, 50) . '....';
                                             }
                                             ?>
                                         </td>
                                         <td>{{ $complaint->user_name }}</td>
-                                        <td>{{ $complaint->recipient_name }}</td>
+                                        <td>{{ $complaint->position_name }}</td>
                                         <td>{{ ($complaint->is_anonymous == 1) ? 'Yes' :'No' }}</td>
                                         <td>{{ ($complaint->is_private == 1) ? 'Yes' : 'No' }} </td>
                                         <td>
-                                            <a href="{{ url('admin/complaint/'.$complaint->id) }}" 
-                                                class="btn btn-primary btn-sm mb-1">
+                                            {{-- <a href="{{ url('admin/complaint?complaint_id='.$complaint->id) }}"  --}}
+                                            <a href=#
+                                                class="btn btn-primary btn-sm mb-1" data-toggle="modal" 
+                                                data-target="#show-complaint-modal-{{$complaint->id}}">
                                                 <i class="fas fa-eye"></i>
                                             </a>
                                             <a href="{{ url('admin/complaint/'.$complaint->id.'/edit') }}" 
@@ -133,7 +141,8 @@
                                             </form>
 
                                         </td>
-                                    </tr>
+                                    </tr>                                    
+                                    @livewire('admin.show-modal-complaint', ['complaint' => $complaint])
                                     @endforeach
                                 </tbody>
                             </table>
@@ -151,7 +160,7 @@
         <footer class="sticky-footer bg-white">
             <div class="container my-auto">
                 <div class="copyright text-center my-auto">
-                    <span>Copyright &copy; Your Website 2021</span>
+                    <span>Copyright &copy; Pengaduan Masyarakat 2021</span>
                 </div>
             </div>
         </footer>
@@ -170,9 +179,8 @@
 
 <!-- Logout Modal-->
 @livewire('admin.logout-modal')
-@livewire('admin.show-complaint-modal', [
-    'com' => $user,
-])
+@if (isset($data['complaint']))
+@endif
 
 @endsection
 

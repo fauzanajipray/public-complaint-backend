@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Complaint;
-use App\Models\Recipient;
+use App\Models\Position;
 use Illuminate\Http\Request;
 
 class ComplaintController extends Controller
@@ -16,15 +16,21 @@ class ComplaintController extends Controller
      */
     public function index(Request $request)
     {   
-        $complaints = Complaint::joinUser()->joinRecipient()->select('complaints.*', 'users.name as user_name', 'recipients.name as recipient_name')->orderBy('created_at', 'DESC');
+        $data['complaint'] = null; 
+        if($request->has('complaint_id')){
+            $complaint = Complaint::find($request->complaint_id);
+            dd($complaint);
+        }
+
+        $complaints = Complaint::joinUser()->joinPosition()->select('complaints.*', 'users.name as user_name', 'positions.name as position_name')->orderBy('created_at', 'DESC');
 
         $data['complaints'] = $complaints->private()
                                         ->search()
-                                        ->recipient()
+                                        ->position()
                                         ->status()
                                         ->orderByDate()
                                         ->get();
-        $data['recipients'] = Recipient::all();
+        $data['positions'] = Position::all();
         $requests = $request;
         return view('admin.complaint.index', compact('data', 'requests'));
     }

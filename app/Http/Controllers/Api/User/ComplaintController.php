@@ -20,7 +20,6 @@ class ComplaintController extends Controller
      */
     public function index(Request $request)
     {    
-        
         try {
             $complaints = Complaint::private()->anonymous()
                             ->userId()

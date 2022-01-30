@@ -7,17 +7,17 @@ use Livewire\Component;
 
 class Header extends Component
 {
-    public $username;
+    public $user;
 
     public function mount()
     {
-        $this->username = User::find(session("admin_id"))->name;
+        $this->user = User::find(session("admin_id"));
     }  
 
     public function render()
     {
         return view('livewire.admin.header', [
-            'username' => $this->username,
+            'user' => $this->user,
         ]);
     }
 }

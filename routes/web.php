@@ -25,7 +25,7 @@ Route::get('register', [AuthController::class, 'register'])->name('register');
 
 Route::post('register', [AuthController::class, 'postRegister']);
 
-Route::get('login', [AuthController::class, 'login'])->name('login')->middleware(['is_login']);
+Route::get('login', [AuthController::class, 'login'])->name('login');
 
 Route::post('login', [AuthController::class, 'postLogin']);
 
@@ -49,10 +49,5 @@ Route::middleware(['is_admin'])->group(function () {
         Route::resource('complaint', \App\Http\Controllers\Admin\ComplaintController::class)
             ->only(['index', 'show', 'destroy']);
     });
-
-    // Route::group(['middleware' => 'role:user', 'prefix' => 'user', 'as' => 'user.'], function() {
-    //     Route::resource('complaint', \App\Http\Controllers\User\ComplaintController::class)
-    //         ->only(['index']);
-    // });
-
+    
 });

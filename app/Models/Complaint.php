@@ -13,7 +13,7 @@ class Complaint extends Model
         'user_id',
         'title',
         'description',
-        'recipient_id',
+        'position_id',
         'image',    
         'status',
         'is_anonymous',
@@ -24,7 +24,7 @@ class Complaint extends Model
         'user_id' => 'required|integer',
         'title' => 'required|string|max:255',
         'description' => 'required|string',
-        'recipient_id' => 'required|integer',
+        'position_id' => 'required|integer',
         'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         'status' => 'string|max:255',
         'is_anonymous' => 'required|boolean',
@@ -67,10 +67,10 @@ class Complaint extends Model
         }
     }
 
-    public function scopeRecipient($query)
+    public function scopePosition($query)
     {
-        if (isset(request()->recipient)) {
-            return $query->where('recipient_id', request()->recipient);
+        if (isset(request()->position)) {
+            return $query->where('position_id', request()->position);
         }
     }
 
@@ -87,10 +87,10 @@ class Complaint extends Model
                     ->select('complaints.*', 'users.name as user_name');
     }
 
-    public function scopeJoinRecipient($query)
+    public function scopeJoinPosition($query)
     {
-        return $query->join('recipients', 'recipients.id', '=', 'complaints.recipient_id')
-                    ->select('complaints.*', 'recipients.name as recipient_name');
+        return $query->join('positions', 'positions.id', '=', 'complaints.position_id')
+                    ->select('complaints.*', 'positions.name as position_name');
     }
 
     public function user()

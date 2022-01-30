@@ -18,7 +18,7 @@ class ComplaintFactory extends Factory
             'title' => $this->faker->sentence,
             'description' => $this->faker->paragraph(1),
             'image' => $this->faker->imageUrl(),
-            'recipient_id' => $this->faker->numberBetween(1,5),
+            'position_id' => $this->faker->numberBetween(1,5),
             'is_anonymous' => $this->faker->boolean,
             'is_private' => $this->faker->boolean,
         ];
