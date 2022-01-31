@@ -60,6 +60,15 @@ class Complaint extends Model
         }
     }
 
+    public function scopeSearchWithUsername($query)
+    {
+        if (isset(request()->search)) {
+            return $query->where('title', 'like', '%'.request()->search.'%')
+                        ->orWhere('description', 'like', '%'.request()->search.'%')
+                        ->orWhere('users.name', 'like', '%'.request()->search.'%');
+        }
+    }
+
     public function scopeStatus($query)
     {
         if (isset(request()->status)) {
@@ -70,7 +79,7 @@ class Complaint extends Model
     public function scopePosition($query)
     {
         if (isset(request()->position)) {
-            return $query->where('position_id', request()->position);
+            return $query->where('complaints.position_id', request()->position);
         }
     }
 

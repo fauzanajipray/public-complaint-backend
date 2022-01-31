@@ -17,20 +17,28 @@ class ComplaintController extends Controller
     public function index(Request $request)
     {   
         $data['complaint'] = null; 
-        if($request->has('complaint_id')){
-            $complaint = Complaint::find($request->complaint_id);
-            dd($complaint);
+
+        // if($request->has('complaint_id')){
+        //     $complaint = Complaint::find($request->complaint_id);
+        //     dd($complaint);
+        // }
+
+        $complaints = Complaint::joinUser()->joinPosition()->select('complaints.*', 'users.name as user_name', 'positions.name as position_name');
+        if (isset(request()->order)) {
+            $complaints = $complaints->orderByDate();
+        } else {
+            $complaints = $complaints->orderBy('id', 'asc');
         }
 
-        $complaints = Complaint::joinUser()->joinPosition()->select('complaints.*', 'users.name as user_name', 'positions.name as position_name')->orderBy('created_at', 'DESC');
-
         $data['complaints'] = $complaints->private()
-                                        ->search()
+                                        ->searchWithUsername()
                                         ->position()
                                         ->status()
-                                        ->orderByDate()
-                                        ->get();
+                                        ->paginate(20)
+                                        ->withQueryString();
+                                        
         $data['positions'] = Position::all();
+
         $requests = $request;
         return view('admin.complaint.index', compact('data', 'requests'));
     }
@@ -57,3 +65,5 @@ class ComplaintController extends Controller
         //
     }
 }
+
+

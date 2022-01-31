@@ -4,11 +4,8 @@ namespace App\Http\Controllers\Api\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\Complaint;
-use App\Models\User;
-use App\Models\UserVerify;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class ComplaintController extends Controller
@@ -25,7 +22,8 @@ class ComplaintController extends Controller
                             ->userId()
                             ->search()
                             ->status()
-                            ->paginate(10);
+                            ->paginate(20)
+                            ->withQueryString();
 
             return response()->json([
                 'message' => 'SUCCESS',

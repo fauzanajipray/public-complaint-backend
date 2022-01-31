@@ -28,8 +28,8 @@
                 <!-- Page Heading -->
                 <div class="d-sm-flex align-items-center justify-content-between mb-4">
                     <h1 class="h3 mb-0 text-gray-800">Complaint</h1>
-                    <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
-                            class="fas fa-download fa-sm text-white-50"></i> Generate Report</a>
+                    {{-- <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
+                            class="fas fa-download fa-sm text-white-50"></i> Generate Report</a> --}}
                 </div>
 
                 <!-- DataTales Example -->
@@ -40,7 +40,7 @@
                                 <div class="form-group col-md-3">
                                     <label for="search">Pencarian</label>
                                     <input type="text" class="form-control" id="search" name="search" 
-                                    placeholder="Cari judul, detail.." value="{{ ($requests->search) ? $requests->search : '' }}">
+                                    placeholder="Cari judul, detail, nama" value="{{ ($requests->search) ? $requests->search : '' }}">
                                 </div>
                                 <div class="form-group col-md-3">
                                     <label for="status">Status</label>
@@ -68,39 +68,53 @@
                                     </select>
                                 </div>
                                 <div class="form-group col-md-12">
-                                    <button type="submit" class="btn btn-primary btn-block">Cari</button>
+                                    <button type="submit" class="btn btn-primary btn-block">Filter</button>
                                 </div>
                             </div>
                         </form>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
-                            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                            <table class="table table-bordered" id="" width="100%" cellspacing="0">
                                 <thead>
                                     <tr>
+                                        <th>#</th>
                                         <th>Judul</th>
                                         <th>Deskripsi</th>
                                         <th>Pengaju</th>
                                         <th>Penerima</th>
-                                        <th>Anonim</th>
-                                        <th>Privasi</th>
+                                        <th>Status</th>
+                                        <th>Waktu</th>
+                                        {{-- <th>Privasi</th> --}}
                                         <th>Aksi</th>
                                     </tr>
                                 </thead>
                                 <tfoot>
                                     <tr>
+                                        <th>#</th>
                                         <th>Judul</th>
                                         <th>Deskripsi</th>
                                         <th>Pengaju</th>
                                         <th>Penerima</th>
-                                        <th>Anonim</th>
-                                        <th>Privasi</th>
+                                        <th>Status</th>
+                                        <th>Waktu</th>
+                                        {{-- <th>Privasi</th> --}}
                                         <th>Aksi</th>
                                     </tr>
                                 </tfoot>
+                                {{-- {{ dd($data) }} --}}
                                 <tbody>
+                                @if ($data['complaints']->count() > 0)
+                                        
                                     @foreach ($data['complaints'] as $complaint)
                                     <tr>
+                                        <td>
+                                            @if($requests->page == 1 || $requests->page == null)
+                                                {{ $loop->iteration }}
+                                            @else
+                                                {{ ($requests->page - 1) * 20 + $loop->iteration }}
+                                            @endif
+                                        </td>
                                         <td><?php
                                             if (strlen($complaint->titlen) < 50) {
                                                echo $complaint->title;
@@ -119,8 +133,10 @@
                                         </td>
                                         <td>{{ $complaint->user_name }}</td>
                                         <td>{{ $complaint->position_name }}</td>
-                                        <td>{{ ($complaint->is_anonymous == 1) ? 'Yes' :'No' }}</td>
-                                        <td>{{ ($complaint->is_private == 1) ? 'Yes' : 'No' }} </td>
+                                        <td>{{ $complaint->status }}</td>
+                                        <td> @livewire('convert-date', ['date' => $complaint->created_at ])</td>
+                                        {{-- <td>{{ ($complaint->is_anonymous == 1) ? 'Yes' :'No' }}</td>
+                                        <td>{{ ($complaint->is_private == 1) ? 'Yes' : 'No' }} </td> --}}
                                         <td>
                                             {{-- <a href="{{ url('admin/complaint?complaint_id='.$complaint->id) }}"  --}}
                                             <a href=#
@@ -144,8 +160,24 @@
                                     </tr>                                    
                                     @livewire('admin.show-modal-complaint', ['complaint' => $complaint])
                                     @endforeach
+                                @else
+                                    <tr>
+                                        <td colspan="8" class="text-center">Tidak ada data</td>
+                                    </tr>
+                                @endif
                                 </tbody>
                             </table>
+
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="float-left">
+                                    <p>Total Data : {{ $data['complaints']->total() }}</p>
+                                </div>
+                                <div class="float-right">
+                                    {{ $data['complaints']->links() }}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

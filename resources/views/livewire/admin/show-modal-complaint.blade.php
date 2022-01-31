@@ -1,5 +1,5 @@
 {{-- Create Complaint Modal with bootstrap 4 --}}
-<div class="modal fade" id="show-complaint-modal-{{$complaint->id}}" tabindex="-1" role="dialog" aria-labelledby="showComplaintModalLabel" aria-hidden="true">
+<div class="modal fade" id="show-complaint-modal-{{$complaint->id}}" width tabindex="-1" role="dialog" aria-labelledby="showComplaintModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -9,16 +9,13 @@
                 </button>
             </div>
             <div class="modal-body">
+                <h5 class="font-weight-bold"> {{ $complaint->title }} </h5>
+                <p> {{ $complaint->created_at }}</p>
                 <p>
-                    {{ $complaint->title }}
+                    <img src="{{ $complaint->image }}" alt="{{ $complaint->image }}" class="img-thumbnail">
                 </p>
-                <p>
-                    {{ $complaint->description }}
-                </p>
-                <p>
-                    {{ $complaint->created_at }}
-                </p>
-
+                <p> {{ $complaint->description }} </p>
+                <p> {{ $complaint->status }} </p>
 
             </div>
             <div class="modal-footer">
