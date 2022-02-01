@@ -18,7 +18,7 @@ class CreateCommentsTable extends Migration
             $table->foreignId('user_id')->constrained();
             $table->foreignId('complaint_id')->constrained();
             $table->text('body');
-            $table->string('status')->default('Pending'); // Menunggu, Diterima, Ditolak
+            $table->enum('status', ['Menunggu', 'Diteruskan', 'Diterima', 'Ditolak'])->default('Menunggu');
             $table->timestamps();
         });
     }

@@ -20,9 +20,9 @@ class CreateComplaintsTable extends Migration
             $table->string('description');
             $table->foreignId('position_id')->constrained();
             $table->string('image');
-            $table->string('status')->default('Menunggu'); // Menunggu, Diteruskan, Diterima, Ditolak
-            $table->boolean('is_anonymous');
-            $table->boolean('is_private');
+            $table->enum('status', ['Menunggu', 'Diteruskan', 'Diterima', 'Ditolak'])->default('Menunggu');
+            $table->boolean('is_anonymous')->default(0);
+            $table->boolean('is_private')->default(0);
             $table->timestamps();
         });
     }

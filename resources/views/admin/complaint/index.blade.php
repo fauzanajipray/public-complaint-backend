@@ -47,6 +47,7 @@
                                     <select class="custom-select" name="status">
                                         <option value="">Pilih Status</option>
                                         <option value="Menunggu" {{ ($requests->status == "Menunggu") ? "selected" : '' }}>Menunggu</option>
+                                        <option value="Diteruskan" {{ ($requests->status == "Diteruskan") ? "selected" : '' }}>Diteruskan</option>
                                         <option value="Diterima" {{ ($requests->status == "Diterima") ? "selected" : '' }}>Diterima</option>
                                         <option value="Ditolak" {{ ($requests->status == "Ditolak") ? "selected" : '' }}>Ditolak</option>
                                     </select>
@@ -76,7 +77,7 @@
                     <div class="card-body">
                         <div class="table-responsive">
                             <table class="table table-bordered" id="" width="100%" cellspacing="0">
-                                <thead>
+                                <thead class="text-center">
                                     <tr>
                                         <th>#</th>
                                         <th>Judul</th>
@@ -85,11 +86,10 @@
                                         <th>Penerima</th>
                                         <th>Status</th>
                                         <th>Waktu</th>
-                                        {{-- <th>Privasi</th> --}}
                                         <th>Aksi</th>
                                     </tr>
                                 </thead>
-                                <tfoot>
+                                <tfoot class="text-center">
                                     <tr>
                                         <th>#</th>
                                         <th>Judul</th>
@@ -98,11 +98,9 @@
                                         <th>Penerima</th>
                                         <th>Status</th>
                                         <th>Waktu</th>
-                                        {{-- <th>Privasi</th> --}}
                                         <th>Aksi</th>
                                     </tr>
                                 </tfoot>
-                                {{-- {{ dd($data) }} --}}
                                 <tbody>
                                 @if ($data['complaints']->count() > 0)
                                         
@@ -115,50 +113,44 @@
                                                 {{ ($requests->page - 1) * 20 + $loop->iteration }}
                                             @endif
                                         </td>
-                                        <td><?php
-                                            if (strlen($complaint->titlen) < 50) {
-                                               echo $complaint->title;
-                                           } else {
-                                               echo substr($complaint->title, 0, 50) . '....';
-                                           }
-                                           ?></td>
+                                        <td>
+                                            @if (strlen($complaint->title) < 50)
+                                                {{ $complaint->title }}
+                                            @else
+                                                {{ substr($complaint->title, 0, 50) . '....' }}
+                                            @endif
+                                        </td>
+                                        </td>
                                         <td>
                                             <?php
-                                             if (strlen($complaint->description) < 50) {
+                                             if (strlen($complaint->description) < 40) {
                                                 echo $complaint->description;
                                             } else {
-                                                echo substr($complaint->description, 0, 50) . '....';
+                                                echo substr($complaint->description, 0, 40) . '....';
                                             }
                                             ?>
                                         </td>
                                         <td>{{ $complaint->user_name }}</td>
                                         <td>{{ $complaint->position_name }}</td>
-                                        <td>{{ $complaint->status }}</td>
+                                        <td class="text-center">
+                                            @if ($complaint->status == "Menunggu")
+                                                <span class="badge badge-warning">{{ $complaint->status }}</span>
+                                            @elseif ($complaint->status == "Diteruskan")
+                                                <span class="badge badge-info">{{ $complaint->status }}</span>
+                                            @elseif ($complaint->status == "Diterima")
+                                                <span class="badge badge-success">{{ $complaint->status }}</span>
+                                            @elseif ($complaint->status == "Ditolak")
+                                                <span class="badge badge-danger">{{ $complaint->status }}</span>
+                                            @endif
+                                        </td>
                                         <td> @livewire('convert-date', ['date' => $complaint->created_at ])</td>
-                                        {{-- <td>{{ ($complaint->is_anonymous == 1) ? 'Yes' :'No' }}</td>
-                                        <td>{{ ($complaint->is_private == 1) ? 'Yes' : 'No' }} </td> --}}
-                                        <td>
-                                            {{-- <a href="{{ url('admin/complaint?complaint_id='.$complaint->id) }}"  --}}
-                                            <a href=#
-                                                class="btn btn-primary btn-sm mb-1" data-toggle="modal" 
-                                                data-target="#show-complaint-modal-{{$complaint->id}}">
+                                        <td class="text-center">
+                                            <a href="{{ url('admin/complaint/'.$complaint->id) }}"
+                                                class="btn btn-primary btn-sm mb-1" >
                                                 <i class="fas fa-eye"></i>
                                             </a>
-                                            <a href="{{ url('admin/complaint/'.$complaint->id.'/edit') }}" 
-                                                class="btn btn-warning btn-sm mb-1" hidden>
-                                                <i class="fas fa-edit"></i>
-                                            </a>
-                                            <form action="{{ url('admin/complaint/'.$complaint->id) }}" method="post" class="d-inline">
-                                                @csrf
-                                                @method('delete')
-                                                <button type="submit" class="btn btn-danger btn-sm mb-1">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </form>
-
                                         </td>
                                     </tr>                                    
-                                    @livewire('admin.show-modal-complaint', ['complaint' => $complaint])
                                     @endforeach
                                 @else
                                     <tr>

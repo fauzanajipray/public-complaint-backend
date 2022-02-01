@@ -42,7 +42,7 @@ class ConvertDate extends Component
             if( $d >= 1 )
             {
                 $t = round( $d );
-                return ' ' . $t . ' ' . $str . ( $t > 1 ? '' : '' ) . ' yang lalu';
+                return ' ' . $t . ' ' . $str . ( $t > 1 ? '' : '' ) . ' lalu';
             }
         }
     }    

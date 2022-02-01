@@ -14,6 +14,6 @@ class Role extends Model
     ];
 
     public static $rules = [
-        'name' => 'required|string|max:255',
+        'name' => 'required|string|max:255|in:Admin,User,Staff',
     ];
 }

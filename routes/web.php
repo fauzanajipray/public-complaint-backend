@@ -48,6 +48,11 @@ Route::middleware(['is_admin'])->group(function () {
     Route::group(['prefix' => 'admin', 'as' => 'admin.'], function() {
         Route::resource('complaint', \App\Http\Controllers\Admin\ComplaintController::class)
             ->only(['index', 'show', 'destroy']);
+        
+        Route::post('complaint/confirm/{id}', [AdminComplaintController::class, 'confirm'])->name('complaint.confirm');
+        Route::post('complaint/reject/{id}', [AdminComplaintController::class, 'reject'])->name('complaint.reject');
+        
     });
+
     
 });
