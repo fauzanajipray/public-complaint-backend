@@ -15,8 +15,8 @@ class ComplaintController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
-    {    
+    public function index()
+    {   
         try {
             $complaints = Complaint::private()->anonymous()
                             ->userId()
@@ -99,7 +99,7 @@ class ComplaintController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show($id)
-    {
+    {  
         $complaint = Complaint::find($id);
 
         if ($complaint) {

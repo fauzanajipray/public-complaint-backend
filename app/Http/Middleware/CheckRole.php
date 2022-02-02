@@ -16,14 +16,17 @@ class CheckRole
      */
     public function handle(Request $request, Closure $next, string $role)
     {
-        if ($role == 'admin' && auth()->user()->role_id != 1) {
-            abort(403);
+        if ($role == 'staff' && $request->user()->role_id == 3) {
+            return $next($request);
         }
 
-        if ($role == 'user' && auth()->user()->role_id != 2) {
-            abort(403);
-        }
-        
-        return $next($request);
+        if ($role == 'user' && $request->user()->role_id == 2 || $request->user()->role_id == 1) {
+            return $next($request);
+        }                       
+
+        return response()->json([
+            'status' => 403,
+            'message' => __('auth.unauthorized'),
+        ], 403);
     }
 }

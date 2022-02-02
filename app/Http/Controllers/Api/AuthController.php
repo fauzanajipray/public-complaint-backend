@@ -30,7 +30,7 @@ class AuthController extends Controller
             if (!$user || !Hash::check($request->password, $user->password)) {
                 return response()->json([
                     'status' => 401,
-                    'message' => 'Validasi gagal.',
+                    'message' => __('auth.failed'),
                     'errors' => [
                         'password' => ['Password salah.']
                     ]
@@ -40,7 +40,7 @@ class AuthController extends Controller
             if($user->is_email_verified == 0){
                 return response()->json([
                     'status' => 401,
-                    'message' => 'Akun Anda belum diverifikasi, silakan periksa email Anda!',
+                    'message' => __('auth.verify_email'),
                     'errors' => null,
                 ], 401);
             }
@@ -49,7 +49,7 @@ class AuthController extends Controller
 
             return response()->json([
                 'status' => 200,
-                'message' => 'Login berhasil.',
+                'message' => __('auth.login_success', ['name' => $user->name]),
                 'user' => $user,
                 'token' => $token,
                 'errors' => null
@@ -58,7 +58,7 @@ class AuthController extends Controller
 
         return response()->json([
             'status' => 401,
-            'message' => 'Validasi gagal.',
+            'message' => __('auth.failed'),
             'errors' => $validator->errors()
         ], 401);
     }
@@ -71,7 +71,7 @@ class AuthController extends Controller
 
         return response()->json([
             'status' => 200,
-            'message' => 'Logout Berhasil!',
+            'message' => __('auth.logout'),
         ], 200);
 
     }
@@ -108,12 +108,12 @@ class AuthController extends Controller
 
                 Mail::send('email.emailVerificationEmail', ['token' => $token], function($message) use($request){
                     $message->to($request->email);
-                    $message->subject('Email Verification Mail');
+                    $message->subject(__('account.verify.subject'));
                 });
 
                 return response()->json([
                     'status' => 200,
-                    'message' => 'Anda perlu mengkonfirmasi akun Anda. Kami telah mengirimkan kode aktivasi, silakan periksa email Anda!',
+                    'message' => __('auth.register_success'),
                     'user' => $user,
                     'token' => $token,
                     'errors' => null
@@ -123,7 +123,7 @@ class AuthController extends Controller
 
         return response()->json([
             'status' => 401,
-            'message' => 'Gagal mendaftar.',
+            'message' => __('auth.failed'),
             'errors' => $validator->errors()
         ], 401);
 
