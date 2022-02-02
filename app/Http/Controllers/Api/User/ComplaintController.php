@@ -22,6 +22,7 @@ class ComplaintController extends Controller
                             ->userId()
                             ->search()
                             ->status()
+                            ->with('comments')
                             ->paginate(20)
                             ->withQueryString();
 
@@ -29,13 +30,17 @@ class ComplaintController extends Controller
                 'message' => 'SUCCESS',
                 'status' => '200',
                 'data' => $complaints,
+                'errors' => null,
             ], 200);
 
         } catch (QueryException $e) {
             return response()->json([
                 'status' => '500',
-                'message' => 'ERROR',
-                'data' => $e->getMessage(),
+                'message' => 'Internal Server Error',
+                'data' => null,
+                'errors' => [
+                    'message' => $e->getMessage(),
+                ],
             ], 500);
         }
     }
@@ -100,7 +105,8 @@ class ComplaintController extends Controller
      */
     public function show($id)
     {  
-        $complaint = Complaint::find($id);
+        $complaint = Complaint::with('user', 'position', 'comments')
+                                ->find($id);
 
         if ($complaint) {
             return response()->json([

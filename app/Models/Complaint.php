@@ -106,4 +106,14 @@ class Complaint extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function position()
+    {
+        return $this->belongsTo(Position::class);
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
 }
