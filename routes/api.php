@@ -20,12 +20,12 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('logout', [AuthController::class, 'logout']);
     
     // make route group prefix user
-    Route::group(['prefix' => 'user', 'middleware' => 'role:user'], function () {
+    Route::group(['prefix' => 'user', 'middleware' => 'role.api:user'], function () {
         Route::resource('complaints', UserComplaintController::class);
     });
     
     // make route group prefix staff
-    Route::group(['prefix' => 'staff', 'middleware' => 'role:staff'], function () {
+    Route::group(['prefix' => 'staff', 'middleware' => 'role.api:staff'], function () {
         Route::resource('complaints', StaffComplaintController::class);
     });
 

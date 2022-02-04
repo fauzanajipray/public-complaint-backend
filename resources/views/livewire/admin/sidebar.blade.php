@@ -51,7 +51,14 @@
     <li class="nav-item">
         <a class="nav-link" href="{{ route('admin.complaint.index') }}">
             <i class="fas fa-fw fa-table"></i>
-            <span>Complaints</span></a>
+            <span>Pengaduan</span></a>
+    </li>
+
+    <!-- Nav Item - Tables -->
+    <li class="nav-item">
+        <a class="nav-link" href="{{ route('admin.user.index') }}">
+            <i class="fas fa-fw fa-table"></i>
+            <span>Pengguna</span></a>
     </li>
     
     {{-- <!-- Nav Item - Tables -->

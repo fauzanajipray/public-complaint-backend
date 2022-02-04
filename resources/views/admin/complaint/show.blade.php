@@ -87,6 +87,80 @@
                         </div>
                     </div>
                     
+                    <div class="{{ ($data['complaint']->status == 'Menunggu') ? "col-md-8" : "col-md-12" }} mb-4">
+                        <div class="card shadow" >
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">
+                                    Komentar
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered" id="" width="100%" cellspacing="0">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Nama</th>
+                                                <th>Komentar</th>
+                                                <th>Status</th>
+                                                <th>Waktu</th>
+                                            </tr>
+                                        </thead>
+                                        <tfoot>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Nama</th>
+                                                <th>Komentar</th>
+                                                <th>Status</th>
+                                                <th>Waktu</th>
+                                            </tr>
+                                        </tfoot>
+                                        <tbody>
+                                            @if ($data['complaint']['comments']->count() > 0)
+                                            @foreach ($data['complaint']['comments'] as $comment)
+                                            <tr>
+                                                <td>{{ $loop->iteration }}</td>
+                                                <td>
+                                                    @if ($comment->user_role == '1')
+                                                    <span class="badge badge-primary">Admin</span>
+                                                    @elseif ($comment->user_role == '2')
+                                                    <span class="badge badge-success">Pengadu</span>
+                                                    @else
+                                                    <span class="badge badge-warning">Staff</span>
+                                                    @endif
+                                                    <a href="{{ url('admin/user/'.$comment->user_id) }}">
+                                                        {{ $comment->user_name }}
+                                                    </a>
+                                                </td>
+                                                <td>{{ $comment->body }}</td>
+                                                <td class="text-center">
+                                                    @if ($comment->status == 'Diteruskan')
+                                                    <span class="badge badge-info">Diteruskan</span>
+                                                    @elseif ($comment->status == 'Ditolak')
+                                                    <span class="badge badge-danger">Ditolak</span>
+                                                    @else
+                                                    <span class="badge badge-success">Diterima</span>
+                                                    @endif
+                                                </td>
+                                                <td>
+                                                    @livewire('convert-date-indo', ['date' => $comment->created_at ])
+                                                </td>
+                                            </tr>
+                                            @endforeach
+                                            @else
+                                            <tr>
+                                                <td colspan="5" class="text-center">
+                                                    Belum ada komentar
+                                                </td>
+                                            </tr>
+                                            @endif
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
                     @if($data['complaint']->status == 'Menunggu')
                     <div class="col-md-4 mb-4">
                         <div class="card shadow"> 
@@ -119,63 +193,7 @@
                     </div>
                     @endif
 
-                    {{-- {{ dd($data['complaint']) }} --}}
-
-                    <div class="{{ ($data['complaint']->status == 'Menunggu') ? "col-md-8" : "col-md-12" }} mb-4">
-                        <div class="card shadow" >
-                            <div class="card-header py-3">
-                                <h6 class="m-0 font-weight-bold text-primary">
-                                    Komentar
-                                </h6>
-                            </div>
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table table-bordered" id="" width="100%" cellspacing="0">
-                                        <thead>
-                                            <tr>
-                                                <th>#</th>
-                                                <th>Nama</th>
-                                                <th>Komentar</th>
-                                                <th>Status</th>
-                                                <th>Waktu</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach ($data['complaint']['comments'] as $comment)
-                                            <tr>
-                                                <td>{{ $loop->iteration }}</td>
-                                                <td>
-                                                    @if ($comment->user_role == '1')
-                                                    <span class="badge badge-primary">Admin</span>
-                                                    @elseif ($comment->user_role == '2')
-                                                    <span class="badge badge-success">Pengadu</span>
-                                                    @else
-                                                    <span class="badge badge-warning">Staff</span>
-                                                    @endif
-                                                    <a href="{{ url('admin/users/'.$comment->user_id) }}">
-                                                        {{ $comment->user_name }}
-                                                    </a>
-                                                </td>
-                                                <td>{{ $comment->body }}</td>
-                                                <td class="text-center">
-                                                    @if ($comment->status == 'Diteruskan')
-                                                    <span class="badge badge-info">Diteruskan</span>
-                                                    @elseif ($comment->status == 'Ditolak')
-                                                    <span class="badge badge-danger">Ditolak</span>
-                                                    @else
-                                                    <span class="badge badge-success">Diterima</span>
-                                                    @endif
-                                                </td>
-                                                <td>
-                                                    @livewire('convert-date-indo', ['date' => $comment->created_at ])
-                                                </td>
-                                            </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
+                    
                 </div>
 
             </div>

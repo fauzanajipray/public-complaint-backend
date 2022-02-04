@@ -45,4 +45,62 @@ class User extends Authenticatable implements MustVerifyEmail
         'email_verified_at' => 'datetime',
     ];
 
+    /**
+     * Relationship Table
+     * 
+     */
+    
+    public function detail(){
+        return $this->hasOne(UserDetail::class);
+    }
+
+    public function role(){
+        return $this->belongsTo(Role::class);
+    }
+
+    public function position(){
+        return $this->belongsTo(Position::class);
+    }
+
+    public function complaints(){
+        return $this->hasMany(Complaint::class);
+    }
+
+    public function comments(){
+        return $this->hasMany(Comment::class);
+    }
+
+    /**
+     * Filter
+     * 
+     */
+
+    public function scopeStatus($query)
+    {
+        if (isset(request()->status)) {
+            return $query->where('is_email_verified', request()->status);
+        }
+    }
+
+    public function scopeSearch($query)
+    {
+        if (isset(request()->search)) {
+            return $query->where('name', 'like', '%'.request()->search.'%')
+                        ->orWhere('email', 'like', '%'.request()->search.'%');
+        }
+    }
+
+    public function scopeOrderByDate($query)
+    {
+        if (isset(request()->order)) {
+            return $query->orderBy('created_at', request()->order);
+        }
+    }
+
+    public function scopeRole($query)
+    {
+        if (isset(request()->role)) {
+            return $query->where('role_id', request()->role);
+        }
+    }
 }

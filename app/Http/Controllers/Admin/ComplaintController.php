@@ -18,23 +18,12 @@ class ComplaintController extends Controller
      */
     public function index(Request $request)
     {   
-        $data['complaint'] = null; 
-
-        // if($request->has('complaint_id')){
-        //     $complaint = Complaint::find($request->complaint_id);
-        //     dd($complaint);
-        // }
-
         $complaints = Complaint::joinUser()->joinPosition()->select('complaints.*', 'users.name as user_name', 'positions.name as position_name');
-        if (isset(request()->order)) {
-            $complaints = $complaints->orderByDate();
-        } else {
-            $complaints = $complaints->orderBy('id', 'asc');
-        }
-
+        
         $data['complaints'] = $complaints->private()
                                         ->searchWithUsername()
                                         ->position()
+                                        ->orderByDate()
                                         ->status()
                                         ->paginate(20)
                                         ->withQueryString();

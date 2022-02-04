@@ -6,6 +6,7 @@ use App\Helpers\Rules\Password;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\UserDetail;
 use App\Models\UserVerify;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
@@ -49,7 +50,7 @@ class AuthController extends Controller
 
             return response()->json([
                 'status' => 200,
-                'message' => __('auth.login_success', ['name' => $user->name]),
+                'message' => __('auth.login.success', ['name' => $user->name]),
                 'user' => $user,
                 'token' => $token,
                 'errors' => null
@@ -106,6 +107,10 @@ class AuthController extends Controller
                     'token' => $token
                 ]);
 
+                UserDetail::create([
+                    'user_id' => $user->id
+                ]);
+
                 Mail::send('email.emailVerificationEmail', ['token' => $token], function($message) use($request){
                     $message->to($request->email);
                     $message->subject(__('account.verify.subject'));
@@ -113,7 +118,7 @@ class AuthController extends Controller
 
                 return response()->json([
                     'status' => 200,
-                    'message' => __('auth.register_success'),
+                    'message' => __('auth.register.success'),
                     'user' => $user,
                     'token' => $token,
                     'errors' => null

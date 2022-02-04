@@ -83,10 +83,12 @@ class Complaint extends Model
         }
     }
 
-    public function scopeOrderByDate($query)
+    public function scopeOrderByDate($query, $order = 'desc')
     {
         if (isset(request()->order)) {
             return $query->orderBy('created_at', request()->order);
+        } else {
+            return $query->orderBy('created_at', $order);
         }
     }
 
@@ -102,9 +104,9 @@ class Complaint extends Model
                     ->select('complaints.*', 'positions.name as position_name');
     }
 
-    public function user()
+    public function users()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function position()

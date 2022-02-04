@@ -14,7 +14,7 @@ class ComplaintFactory extends Factory
     public function definition()
     {
         return [
-            'user_id' => $this->faker->numberBetween(1,5),
+            'user_id' => $this->faker->numberBetween(1,20),
             'title' => $this->faker->sentence,
             'description' => $this->faker->paragraph(1),
             'image' => $this->faker->imageUrl(),

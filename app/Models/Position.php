@@ -17,4 +17,9 @@ class Position extends Model
         'name' => 'required|string|max:255',
     ];
 
+    public function users()
+    {
+        return $this->hasMany(User::class);
+    }
+
 }
