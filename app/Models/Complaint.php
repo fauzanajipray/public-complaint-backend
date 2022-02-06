@@ -76,8 +76,12 @@ class Complaint extends Model
         }
     }
 
-    public function scopePosition($query)
+    public function scopePosition($query, $id = null)
     {
+        if (isset($id)) {
+            return $query->where('position_id', $id);
+        }
+        else 
         if (isset(request()->position)) {
             return $query->where('complaints.position_id', request()->position);
         }

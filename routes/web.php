@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Admin\ComplaintController as AdminComplaintController;
+use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -40,6 +41,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'is_admin']
     Route::post('complaint/confirm/{id}', [AdminComplaintController::class, 'confirm'])->name('complaint.confirm');
     Route::post('complaint/reject/{id}', [AdminComplaintController::class, 'reject'])->name('complaint.reject');
     
-    Route::resource('user', \App\Http\Controllers\Admin\UserController::class)
+    Route::resource('user', UserController::class)
         ->only(['index', 'show', 'edit', 'update']);
+
+    Route::put('user/setting/{id}', [UserController::class, 'setting'])->name('user.setting');
 });

@@ -3,8 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Complaint;
+use App\Models\Position;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
@@ -31,27 +35,6 @@ class UserController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
      * Display the specified resource.
      *
      * @param  int  $id
@@ -61,16 +44,34 @@ class UserController extends Controller
     {
         $data['user'] = User::find($id);
 
-        $data['user']->setRelation('complaints', $data['user']->complaints()->joinPosition()->paginate(10));
-        // $data['user']->setRelation('comments', $data['user']->comments()->paginate(10));
-        // $category = Category::first();
-        // $category->setRelation('apps', $category->apps()->paginate(10));
-        // return view('example', compact('category');
-        
-        $data['positions'] = $data['user']->positions;
+        if ($data['user'] == null) {
+            return redirect()->back()->with('error', __('httpresponse.404.description'));
+        }
 
+        $data['user']->setRelation('complaints', $data['user']->complaints()->joinPosition()
+                    ->paginate($perPage = 2, $columns = ['*'], $pageName = 'pg_cp')->withQueryString()
+        );
 
-        // dd($data['user']);
+        $data['user']->setRelation('comments', $data['user']->comments()->paginate(
+            $perPage = 5, $columns = ['*'], $pageName = 'pg_cm')->withQueryString()
+        );
+
+        if ($data['user']->role_id != 3) {
+            $data['positions'] = Position::all();
+            $data['position_complaints'] = null;
+        }
+        else {
+
+            $data['positions'] = Position::get()->filter(function ($position) use ($data) {
+                return $position->id != $data['user']->position->id;
+            });
+    
+            $data['position_complaints'] = Complaint::select('complaints.*')->position($data['user']->position->id)
+                                        ->paginate($perPage = 10, $columns = ['*'], $pageName = 'pg_pscp')->withQueryString();
+        }
+    
+
+        // dd($data['positions'], $data['user']->position, $data['complaints']);
 
         return view('admin.user.show', compact('data', 'requests'));
     }
@@ -107,5 +108,40 @@ class UserController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function setting(Request $request, $id)
+    {
+        $requests = $request->all();
+        $validator = Validator::make($requests, [
+            'password' => 'required|string',
+            'role' => 'nullable|integer',
+            'position' => 'nullable|integer',
+        ]);
+        if ($validator->fails()) {   
+            return redirect()->back()->with('error', $validator->errors()->first());
+        }
+        $admin = User::find(session('admin_id'));
+        $user = User::find($id);
+
+        if (!Hash::check($requests['password'], $admin->password)) {
+            return redirect()->back()->with('error', 'Password salah');
+        } 
+
+        if (isset($requests['role'])) {
+
+            $user->role_id = $requests['role'];
+            if ($requests['role'] == 3) {
+                if(isset($requests['position'])) {
+                    $user->position_id = $requests['position'];
+                } else {
+                    return redirect()->back()->with('error', 'Jabatan harus diisi');
+                }
+            } else {
+                $user->position_id = null;
+            }
+        }
+        $user->update();
+        return redirect()->back()->with('success', 'Update data sukses');
     }
 }

@@ -132,14 +132,14 @@
                                         <td>
                                             <a href="{{ url('admin/user/'.$user->id) }}" class="btn btn-primary btn-sm mb-1"> <i class="fas fa-eye"></i>
                                                 </a>
-                                            @if($user->role_id != 1)
+                                            {{-- @if($user->role_id != 1)
                                             <a href="{{ url('admin/user/'.$user->id.'/edit') }}" class="btn btn-warning btn-sm mb-1"> <i class="fas fa-edit"></i> </a>
                                             @endif
                                             <form action="{{ url('admin/user/'.$user->id) }}" method="delete" class="d-inline-block mb-1" style="padding-top: -50px">
                                                 @csrf
                                                 @method('delete')
                                                 <button type="submit" class="btn btn-danger btn-sm " style=""> <i class="fas fa-trash"></i> </button>
-                                            </form>
+                                            </form> --}}
                                         </td>
                                     </tr>                  
                                     @endforeach
