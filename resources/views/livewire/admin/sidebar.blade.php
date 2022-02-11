@@ -23,11 +23,11 @@
 
     <!-- Heading -->
     <div class="sidebar-heading">
-        Interface
+        Master
     </div>
 
     <!-- Nav Item - Pages Collapse Menu -->
-    <li class="nav-item">
+    <li class="nav-item" hidden>
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages"
             aria-expanded="true" aria-controls="collapsePages">
             <i class="fas fa-fw fa-folder"></i>
@@ -49,7 +49,7 @@
 
     <li class="nav-item">
         <a class="nav-link" href="{{ route('admin.complaint.index') }}">
-            <i class="fas fa-fw fa-table"></i>
+            <i class="fas fa-fw fa-bullhorn"></i>
             <span>Pengaduan</span></a>
     </li>
 
@@ -61,7 +61,7 @@
     
     <li class="nav-item">
         <a class="nav-link" href="{{ route('admin.position.index') }}">
-            <i class="fas fa-fw fa-table"></i>
+            <i class="fas fa-user-tie"></i>
             <span>Jabatan</span></a>
     </li>
 
