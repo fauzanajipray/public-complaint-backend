@@ -15,10 +15,10 @@ class CreateComplaintsTable extends Migration
     {
         Schema::create('complaints', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('title');
             $table->string('description');
-            $table->foreignId('position_id')->constrained();
+            $table->foreignId('position_id')->constrained()->onDelete('cascade');
             $table->string('image');
             $table->enum('status', ['Menunggu', 'Diteruskan', 'Diterima', 'Ditolak'])->default('Menunggu');
             $table->boolean('is_anonymous')->default(0);

@@ -11,15 +11,21 @@ class Position extends Model
 
     protected $fillable = [
         'name',
+        'description',
     ];
 
     public static $rules = [
-        'name' => 'required|string|max:255',
+        'name' => 'required|string|max:255|unique:positions',
     ];
 
     public function user()
     {
         return $this->hasOne(User::class);
+    }
+
+    public function complaints()
+    {
+        return $this->hasMany(Complaint::class);
     }
 
 }

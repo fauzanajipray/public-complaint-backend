@@ -321,7 +321,6 @@
                     </div>
                     @endif
                     
-                    {{-- {{ dd($data['user']->complaint ) }} --}}
                     @if ($data['user']->role_id != 3 )
                     <div class="col-md-12 mb-4">
                         <div class="card shadow">

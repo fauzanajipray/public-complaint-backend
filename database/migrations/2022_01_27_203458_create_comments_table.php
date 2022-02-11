@@ -16,7 +16,7 @@ class CreateCommentsTable extends Migration
         Schema::create('comments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained();
-            $table->foreignId('complaint_id')->constrained();
+            $table->foreignId('complaint_id')->constrained()->onDelete('cascade');
             $table->text('body');
             $table->enum('status', ['Menunggu', 'Diteruskan', 'Diterima', 'Ditolak'])->default('Menunggu');
             $table->timestamps();

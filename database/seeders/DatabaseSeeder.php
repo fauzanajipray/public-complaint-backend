@@ -18,21 +18,21 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        // Role::create(['name' => 'Admin']);
-        // Role::create(['name' => 'User']);
-        // Role::create(['name' => 'Staff']);
+        Role::create(['name' => 'Admin']);
+        Role::create(['name' => 'User']);
+        Role::create(['name' => 'Staff']);
         
-        // Position::create(['name' => 'Kepala Desa']);
-        // Position::create(['name' => 'Kepala Dusun Karangrejo']);
-        // Position::create(['name' => 'Kepala Dusun Gondang Rejo']);
-        // Position::create(['name' => 'Kepala Dusun Karangnongko']);
-        // Position::create(['name' => 'Kepala Dusun Brangkal']);
+        Position::create(['name' => 'Kepala Desa']);
+        Position::create(['name' => 'Kepala Dusun Karangrejo']);
+        Position::create(['name' => 'Kepala Dusun Gondang Rejo']);
+        Position::create(['name' => 'Kepala Dusun Karangnongko']);
+        Position::create(['name' => 'Kepala Dusun Brangkal']);
         
-        // $user = User::factory(20)->create();
-        // $user->each(function ($u) {
-        //     $u->detail()->save(UserDetail::factory()->make());
-        // });
+        $user = User::factory(20)->create();
+        $user->each(function ($u) {
+            $u->detail()->save(UserDetail::factory()->make());
+        });
 
-        // Complaint::factory(100)->create();
+        Complaint::factory(155)->create();
     }
 }

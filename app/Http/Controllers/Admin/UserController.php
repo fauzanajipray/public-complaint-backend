@@ -12,11 +12,6 @@ use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index(Request $requests)
     {
         $users = User::select('users.*');
@@ -34,19 +29,9 @@ class UserController extends Controller
         return view('admin.user.index', compact('data', 'requests'));
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function show(Request $requests, $id)
     {
-        $data['user'] = User::find($id);
-
-        if ($data['user'] == null) {
-            return redirect()->back()->with('error', __('httpresponse.404.description'));
-        }
+        $data['user'] = User::findOrFail($id);
 
         $data['user']->setRelation('complaints', $data['user']->complaints()->joinPosition()
                     ->paginate($perPage = 2, $columns = ['*'], $pageName = 'pg_cp')->withQueryString()
@@ -55,56 +40,31 @@ class UserController extends Controller
         $data['user']->setRelation('comments', $data['user']->comments()->paginate(
             $perPage = 5, $columns = ['*'], $pageName = 'pg_cm')->withQueryString()
         );
+        
+        $data['positions'] = Position::get()->filter(function ($position) {
+            return $position->user == null;
+        });
+        
+        $data['position_complaints'] = null;
 
-        if ($data['user']->role_id != 3) {
-            $data['positions'] = Position::all();
-            $data['position_complaints'] = null;
-        }
-        else {
-
-            $data['positions'] = Position::get()->filter(function ($position) use ($data) {
-                return $position->id != $data['user']->position->id;
-            });
-    
+        if ($data['user']->role_id == 3) {
             $data['position_complaints'] = Complaint::select('complaints.*')->position($data['user']->position->id)
                                         ->paginate($perPage = 10, $columns = ['*'], $pageName = 'pg_pscp')->withQueryString();
         }
-    
-
-        // dd($data['positions'], $data['user']->position, $data['complaints']);
 
         return view('admin.user.show', compact('data', 'requests'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function edit($id)
     {
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
     {
         //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
         //

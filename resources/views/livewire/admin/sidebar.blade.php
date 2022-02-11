@@ -47,26 +47,23 @@
         </div>
     </li>
 
-    <!-- Nav Item - Tables -->
     <li class="nav-item">
         <a class="nav-link" href="{{ route('admin.complaint.index') }}">
             <i class="fas fa-fw fa-table"></i>
             <span>Pengaduan</span></a>
     </li>
 
-    <!-- Nav Item - Tables -->
     <li class="nav-item">
         <a class="nav-link" href="{{ route('admin.user.index') }}">
-            <i class="fas fa-fw fa-table"></i>
+            <i class="fas fa-fw fa-users"></i>
             <span>Pengguna</span></a>
     </li>
     
-    {{-- <!-- Nav Item - Tables -->
     <li class="nav-item">
-        <a class="nav-link" href="tables.html">
+        <a class="nav-link" href="{{ route('admin.position.index') }}">
             <i class="fas fa-fw fa-table"></i>
-            <span>User</span></a>
-    </li> --}}
+            <span>Jabatan</span></a>
+    </li>
 
     <!-- Divider -->
     <hr class="sidebar-divider d-none d-md-block">

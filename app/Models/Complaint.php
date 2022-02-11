@@ -31,6 +31,8 @@ class Complaint extends Model
         'is_private' => 'required|boolean',
     ];
     
+    //* Filter *//
+    
     public function scopePrivate($query)
     {   
         if (isset(request()->private)) {
@@ -96,6 +98,8 @@ class Complaint extends Model
         }
     }
 
+    //* Join *//
+
     public function scopeJoinUser($query)
     {
         return $query->join('users', 'users.id', '=', 'complaints.user_id')
@@ -107,6 +111,9 @@ class Complaint extends Model
         return $query->join('positions', 'positions.id', '=', 'complaints.position_id')
                     ->select('complaints.*', 'positions.name as position_name');
     }
+    
+
+    //* Relationships *//
 
     public function users()
     {

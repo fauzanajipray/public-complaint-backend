@@ -11,15 +11,9 @@ use Illuminate\Http\Request;
 
 class ComplaintController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index(Request $request)
     {   
         $complaints = Complaint::joinUser()->joinPosition()->select('complaints.*', 'users.name as user_name', 'positions.name as position_name');
-        
         $data['complaints'] = $complaints->private()
                                         ->searchWithUsername()
                                         ->position()
@@ -29,17 +23,10 @@ class ComplaintController extends Controller
                                         ->withQueryString();
                                         
         $data['positions'] = Position::all();
-
         $requests = $request;
         return view('admin.complaint.index', compact('data', 'requests'));
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function show($id)
     {
         $data['complaint'] = Complaint::joinUser()->joinPosition()
@@ -53,23 +40,11 @@ class ComplaintController extends Controller
         return view('admin.complaint.show', compact('data'));
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
         //
     }
 
-    /**
-     * Confirm the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function confirm(Request $request, $id)
     {
         try {
@@ -92,12 +67,6 @@ class ComplaintController extends Controller
         }
     }
 
-    /**
-     * Reject the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function reject(Request $request, $id)
     {
         try {
