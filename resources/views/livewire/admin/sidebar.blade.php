@@ -61,7 +61,7 @@
     
     <li class="nav-item">
         <a class="nav-link" href="{{ route('admin.position.index') }}">
-            <i class="fas fa-user-tie"></i>
+            <i class="fas fa-fw fa-user-tie"></i>
             <span>Jabatan</span></a>
     </li>
 
