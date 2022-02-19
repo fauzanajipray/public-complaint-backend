@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\Rules\Password;
 use App\Models\User;
+use App\Models\UserDetail;
 use App\Models\UserVerify;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -45,6 +46,10 @@ class AuthController extends Controller
             UserVerify::create([
                 'user_id' => $user->id, 
                 'token' => $token
+            ]);
+
+            UserDetail::create([
+                'user_id' => $user->id
             ]);
 
             Mail::send('email.emailVerificationEmail', ['token' => $token], function($message) use($request){
