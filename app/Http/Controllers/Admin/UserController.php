@@ -14,17 +14,16 @@ class UserController extends Controller
 {
     public function index(Request $requests)
     {
+        // dd($requests);
         $users = User::select('users.*');
-        if (isset(request()->order)) {
-            $users = $users->orderByDate();
-        } else {
-            $users = $users->orderBy('id', 'asc');
-        }
-        $data['users'] = $users->search()
-                               ->status()
-                               ->role()
-                               ->paginate(20)
-                               ->withQueryString();
+        $data['users'] = User::search()
+                            ->role()
+                            ->orderByDate()
+                            ->status() 
+                            ->paginate(20)
+                            ->withQueryString();
+        
+        // dd($data['users']);
 
         return view('admin.user.index', compact('data', 'requests'));
     }

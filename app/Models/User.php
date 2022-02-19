@@ -75,32 +75,35 @@ class User extends Authenticatable implements MustVerifyEmail
      * 
      */
 
-    public function scopeStatus($query)
-    {
-        if (isset(request()->status)) {
-            return $query->where('is_email_verified', request()->status);
-        }
-    }
-
+    
     public function scopeSearch($query)
     {
         if (isset(request()->search)) {
             return $query->where('name', 'like', '%'.request()->search.'%')
-                        ->orWhere('email', 'like', '%'.request()->search.'%');
+            ->orWhere('email', 'like', '%'.request()->search.'%');
         }
     }
-
+    
     public function scopeOrderByDate($query)
     {
         if (isset(request()->order)) {
             return $query->orderBy('created_at', request()->order);
+        } else {
+            return $query->orderBy('created_at', 'desc');
         }
     }
-
+    
     public function scopeRole($query)
     {
         if (isset(request()->role)) {
             return $query->where('role_id', request()->role);
+        }
+    }
+
+    public function scopeStatus($query)
+    {
+        if (isset(request()->status)) {
+            return $query->where('is_email_verified', request()->status);
         }
     }
 }

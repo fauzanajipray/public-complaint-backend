@@ -43,14 +43,6 @@
                                     placeholder="Cari nama, email" value="{{ ($requests->search) ? $requests->search : '' }}">
                                 </div>
                                 <div class="form-group col-md-3">
-                                    <label for="status">Status</label>
-                                    <select class="custom-select" name="status">
-                                        <option value="">Pilih Status</option>
-                                        <option value="1" {{ ($requests->status == 1) ? "selected" : '' }}>Terverifikasi</option>
-                                        <option value="0" {{ ($requests->status == 0) ? "selected" : '' }}>Belum Terverifikasi</option>
-                                    </select>
-                                </div>
-                                <div class="form-group col-md-3">
                                     <label for="role">Role</label>
                                     <select class="custom-select" id="role" name="role">
                                         <option value="">Pilih Role</option>
@@ -58,6 +50,14 @@
                                         <option value="2" {{ ($requests->role == 2) ? "selected" : '' }}>Pengadu</option>
                                         <option value="3" {{ ($requests->role == 3) ? "selected" : '' }}>Staff</option>
                                    </select>
+                                </div>
+                                <div class="form-group col-md-3">
+                                    <label for="status">Status</label>
+                                    <select class="custom-select" name="status">
+                                        <option value="" >Pilih Status</option>
+                                        <option value="1" {{ ($requests->status == 1) ? "selected" : '' }}>Terverifikasi</option>
+                                        <option value="2" {{ ($requests->status == 2) ? "selected" : '' }}>Belum Terverifikasi</option>
+                                    </select>
                                 </div>
                                 <div class="form-group col-md-3">
                                     <label for="order">Urutkan</label>

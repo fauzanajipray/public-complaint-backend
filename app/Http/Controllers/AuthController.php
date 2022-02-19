@@ -101,9 +101,9 @@ class AuthController extends Controller
         $message = 'Mohon maaf, emailmu tidak bisa di identifikasi!';
         if(!is_null($verifyUser) ){
             $user = $verifyUser->user;
-
-            if(!$user->is_email_verified) {
+            if($user->is_email_verified != 1) {
                 $verifyUser->user->is_email_verified = 1;
+                $verifyUser->user->email_verified_at = now();
                 $verifyUser->user->save();
                 $message = "Selamat, email verifikasi sukses!";
             } else {
