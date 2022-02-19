@@ -17,17 +17,16 @@ class CheckRoleApi
     public function handle(Request $request, Closure $next, string $role)
     {
         if ($role == 'staff' && $request->user()->role_id == 3) {
-            dd('staff2');
             return $next($request);
         }
 
-        if ($role == 'user' && $request->user()->role_id == 2 || $role == 'user' && $request->user()->role_id == 1) {
-            return $next($request);
-        }   
+        // if ($role == 'user' && $request->user()->role_id == 2 || $role == 'user' && $request->user()->role_id == 1) {
+        //     return $next($request);
+        // }   
 
-        if ($role == 'admin' && $request->user()->role_id == 1) {
-            return $next($request);
-        }
+        // if ($role == 'admin' && $request->user()->role_id == 1) {
+        //     return $next($request);
+        // }
 
         return response()->json([
             'status' => 403,

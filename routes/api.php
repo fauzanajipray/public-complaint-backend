@@ -20,7 +20,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('logout', [AuthController::class, 'logout']);
     
     // make route group prefix user
-    Route::group(['prefix' => 'user', 'middleware' => 'role.api:user'], function () {
+    Route::group(['prefix' => 'user'], function () {
         Route::resource('complaints', UserComplaintController::class);
     });
     
