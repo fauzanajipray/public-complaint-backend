@@ -21,7 +21,12 @@ class ComplaintController extends Controller
     public function index(Request $request)
     {   
         try {
-            $complaints = Complaint::paginate(10);
+            $complaints = Complaint::where('position_id' , $request->user()->position_id)
+                ->orderByDate()
+                ->status()
+                ->search()
+                ->paginate(20)
+                ->withQueryString();
             return response()->json([
                 'message' => 'SUCCESS',
                 'status' => '200',
@@ -96,7 +101,7 @@ class ComplaintController extends Controller
      */
     public function show($id)
     {
-        $complaint = Complaint::find($id);
+        $complaint = Complaint::with('comments')->find($id);
 
         if ($complaint) {
             return response()->json([

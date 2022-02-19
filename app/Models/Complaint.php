@@ -74,7 +74,15 @@ class Complaint extends Model
     public function scopeStatus($query)
     {
         if (isset(request()->status)) {
-            return $query->where('status', request()->status);
+            if (request()->status == 'Proses'){
+                return $query->where('status', 'Menunggu')
+                            ->orWhere('status', 'Diteruskan');
+            } else if(request()->status == 'Selesai'){
+                return $query->where('status', 'Diterima')
+                            ->orWhere('status', 'Ditolak');
+            } else {
+                return $query->where('status', request()->status);
+            }
         }
     }
 
