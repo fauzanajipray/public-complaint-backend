@@ -9,8 +9,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
-use function GuzzleHttp\Promise\all;
-
 class ComplaintController extends Controller
 {
     /**
@@ -21,12 +19,28 @@ class ComplaintController extends Controller
     public function index(Request $request)
     {   
         try {
-            $complaints = Complaint::where('position_id' , $request->user()->position_id)
+            $complaints = Complaint::with('comments', 'users')->where('position_id' , $request->user()->position_id)
                 ->orderByDate()
                 ->status()
                 ->search()
+                ->anonymous()
                 ->paginate(20)
                 ->withQueryString();
+            
+            $complaints->map(function ($complaint) {
+                $complaint->setAttribute('username', (!$complaint->anonymous) ? 'Anonymous' : $complaint->users->name); //TODO: Nanti tolong di cek apakah gak terbalik yg anonymous
+                $complaint->setAttribute('comments_count', $complaint->comments->count());
+                
+                unset($complaint->comments);
+                unset($complaint->users);
+                unset($complaint->is_anonymous);
+                unset($complaint->is_private);
+                unset($complaint->user_id);
+                unset($complaint->position_id);
+                unset($complaint->updated_at);
+                return $complaint;
+            });
+
             return response()->json([
                 'message' => 'SUCCESS',
                 'status' => '200',
@@ -99,9 +113,37 @@ class ComplaintController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+    // TODO: Benerin ini
     public function show($id)
     {
+        function getNameByRole($user){
+            if ($user->role_id = 1) {
+                return 'Admin';
+            } else if ($user->role_id = 3) {
+                return $user->position->name;
+            } else {
+                return $user->name;
+            }
+        } 
+
         $complaint = Complaint::with('comments')->find($id);
+
+        $complaint->comments->map(function ($comment) use ($complaint) {  
+            // return [
+            //     'id' => $comment->id,
+            //     'complaint_id' => $comment->complaint_id,
+            //     'user_id' => $comment->user_id,
+            //     'body' => $comment->body,
+            //     'status' => $comment->status,
+            //     'name' => getNameByRole($comment->user),
+            //     'created_at' => $comment->created_at,
+            //     'created_at_human' => $comment->created_at->diffForHumans(),
+            //     'position' => $complaint->position->name,
+            // ];
+            $comment->setAttribute('name', getNameByRole($comment->user));
+            $comment->setAttribute('position', $complaint->position->name);
+            unset($comment->user);
+        });
 
         if ($complaint) {
             return response()->json([
@@ -121,6 +163,8 @@ class ComplaintController extends Controller
             ],
         ], 404);
     }
+
+    
 
     /**
      * Show the form for editing the specified resource.
@@ -226,34 +270,4 @@ class ComplaintController extends Controller
         }
     }
     
-    public function whereStatus(Request $request)
-    {
-        try {
-            dd($request->all());
-            $status = 1;
-            $complaints = Complaint::where('status', $status)->get();
-            if ($complaints) {
-                return response()->json([
-                    'status' => 200,
-                    'message' => 'SUCCESS',
-                    'data' => $complaints,
-                    'error' => null,
-                ], 200);
-            }
-            return response()->json([
-                'status' => 404,
-                'message' => 'NOT_FOUND',
-                'data' => null,
-                'errors' => [
-                    'message' => 'Data not found',
-                ],
-            ], 404);    
-        } catch (QueryException $e) {
-            return response()->json([
-                'status' => 500,
-                'message' => 'ERROR',
-                'data' => $e->getMessage(),
-            ], 500);
-        }
-    }
 }
