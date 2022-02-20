@@ -55,6 +55,7 @@
                 </div>
 
                 <div class="row">
+                    
                     <div class="col-md-12 mb-4">
                         <div class="card shadow">
                             <div class="card-header py-3">
@@ -64,7 +65,19 @@
                                     </h6>
                                 </div>
                                 <div class="float-right">
-                                    <p class="m-0 font-weight-bold text-primary">ID : {{ $data['complaint']->id }}</p>
+                                    <p class="m-0 font-weight-bold text-primary"> 
+                                        <span class="mr-2">
+                                            @if($data['complaint']->status == 'Menunggu')
+                                                <span class="badge badge-warning">Menunggu</span>
+                                            @elseif($data['complaint']->status == 'Diteruskan')
+                                                <span class="badge badge-info">Diteruskan</span>
+                                            @elseif($data['complaint']->status == 'Diterima')
+                                                <span class="badge badge-success">Diterima</span>
+                                            @else
+                                                <span class="badge badge-danger">Ditolak</span>
+                                            @endif
+                                        </span> 
+                                        ID : {{ $data['complaint']->id }}</p>
                                 </div>
                             </div>
                             <div class="card-body">
@@ -72,7 +85,6 @@
                                     <img src="{{ asset($data['complaint']->image) }}" alt="" class="img-fluid img-center" width="500">
                                 </div>
                                 <div>
-                                    {{-- TODO: Isikan detail Pengaduan --}}
                                     <h2 class="mb-3">
                                         {{ $data['complaint']->title }}
                                     </h2>
@@ -80,14 +92,43 @@
                                         {{ $data['complaint']->description }}
                                     </p>
                                 </div>
-                                <div>
+                            </div>
+                        </div>
+                    </div>
 
+                    @if($data['complaint']->status == 'Menunggu')
+                    <div class="col-md-12 mb-4">
+                        <div class="card shadow"> 
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">
+                                    Konfirmasi
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label for="position">Pesan akan didisposisikan kepada</label>
+                                    <select class="custom-select" id="position" name="position">
+                                        <option value="">Pilih Penerima</option>
+                                        @foreach ($data['positions'] as $position)
+                                        <option value="{{ $position->id }}" {{ ($data['complaint']->position_id == $position->id) ? "selected" : '' }}>{{ $position->name }}</option>    
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="text-right mb-3">
+                                    <a class="btn btn-danger m-1" data-toggle="modal" data-target="#complaintRejectModal">
+                                        <i class="fas fa-times" ></i> &nbsp Tolak
+                                    </button>
+                                    <a class="btn btn-success m-1" data-toggle="modal" data-target="#complaintConfirmModal">
+                                        <i class="fas fa-check"></i> &nbsp Terima
+                                    </a>
                                 </div>
                             </div>
                         </div>
                     </div>
+                    @endif
                     
-                    <div class="{{ ($data['complaint']->status == 'Menunggu') ? "col-md-8" : "col-md-12" }} mb-4">
+                    @if($data['complaint']->status != 'Menunggu')
+                    <div class="col-md-12 mb-4">
                         <div class="card shadow" >
                             <div class="card-header py-3">
                                 <h6 class="m-0 font-weight-bold text-primary">
@@ -158,39 +199,7 @@
                             </div>
                         </div>
                     </div>
-                    
-                    @if($data['complaint']->status == 'Menunggu')
-                    <div class="col-md-4 mb-4">
-                        <div class="card shadow"> 
-                            <div class="card-header py-3">
-                                <h6 class="m-0 font-weight-bold text-primary">
-                                    Konfirmasi
-                                </h6>
-                            </div>
-                            {{-- {{ dd($data['complaint']) }} --}}
-                            <div class="card-body">
-                                <div class="form-group">
-                                    <label for="position">Pesan akan didisposisikan kepada :</label>
-                                    <select class="custom-select" id="position" name="position">
-                                        <option value="">Pilih Penerima</option>
-                                        @foreach ($data['positions'] as $position)
-                                        <option value="{{ $position->id }}" {{ ($data['complaint']->position_id == $position->id) ? "selected" : '' }}>{{ $position->name }}</option>    
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div class="text-center mb-3">
-                                    <a class="btn btn-danger m-1" data-toggle="modal" data-target="#complaintRejectModal">
-                                        <i class="fas fa-times" ></i> &nbsp Tolak
-                                    </button>
-                                    <a class="btn btn-success m-1" data-toggle="modal" data-target="#complaintConfirmModal">
-                                        <i class="fas fa-check"></i> &nbsp Terima
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                     @endif
-
                     
                 </div>
 
