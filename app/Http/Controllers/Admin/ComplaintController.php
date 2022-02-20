@@ -13,15 +13,21 @@ class ComplaintController extends Controller
 {
     public function index(Request $request)
     {   
-        $complaints = Complaint::joinUser()->joinPosition()->select('complaints.*', 'users.name as user_name', 'positions.name as position_name');
-        $data['complaints'] = $complaints->private()
-                                        ->searchWithUsername()
-                                        ->position()
-                                        ->orderByDate()
-                                        ->status()
-                                        ->paginate(20)
-                                        ->withQueryString();
-                                        
+        $complaints = Complaint::with('users', 'position')->select('complaints.*');
+        $complaints = $complaints->private()
+            ->searchWithUsername()
+            ->position()
+            ->orderByDate()
+            ->status()
+            ->paginate(20)
+            ->withQueryString();
+        
+        $complaints->map(function ($complaint) {
+            $complaint->setAttribute('user_name', $complaint->users->name);
+            $complaint->setAttribute('position_name', $complaint->position->name);
+        });
+
+        $data['complaints'] = $complaints;
         $data['positions'] = Position::all();
         $requests = $request;
         return view('admin.complaint.index', compact('data', 'requests'));

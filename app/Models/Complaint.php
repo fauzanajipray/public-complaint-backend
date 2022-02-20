@@ -104,22 +104,7 @@ class Complaint extends Model
         } else {
             return $query->orderBy('created_at', $order);
         }
-    }
-
-    //* Join *//
-
-    public function scopeJoinUser($query)
-    {
-        return $query->join('users', 'users.id', '=', 'complaints.user_id')
-                    ->select('complaints.*', 'users.name as user_name');
-    }
-
-    public function scopeJoinPosition($query)
-    {
-        return $query->join('positions', 'positions.id', '=', 'complaints.position_id')
-                    ->select('complaints.*', 'positions.name as position_name');
-    }
-    
+    }    
 
     //* Relationships *//
 
