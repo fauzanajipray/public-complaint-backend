@@ -121,10 +121,8 @@
                                             <tr>
                                                 <td>{{ $loop->iteration }}</td>
                                                 <td>
-                                                    @if ($comment->user_role == '1')
+                                                    @if ($comment->from_role == 'Admin')
                                                     <span class="badge badge-primary">Admin</span>
-                                                    @elseif ($comment->user_role == '2')
-                                                    <span class="badge badge-success">Pengadu</span>
                                                     @else
                                                     <span class="badge badge-warning">Staff</span>
                                                     @endif

@@ -15,10 +15,11 @@ class CreateCommentsTable extends Migration
     {
         Schema::create('comments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->nullable()->constrained('users')->cascadeOnUpdate()->nullOnDelete();
             $table->foreignId('complaint_id')->constrained()->onDelete('cascade');
             $table->text('body');
             $table->enum('status', ['Menunggu', 'Diteruskan', 'Diterima', 'Ditolak'])->default('Menunggu');
+            $table->string('from_role', 10); // Admin, Staff
             $table->timestamps();
         });
     }

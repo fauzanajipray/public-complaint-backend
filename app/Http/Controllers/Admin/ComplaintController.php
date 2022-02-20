@@ -29,13 +29,21 @@ class ComplaintController extends Controller
 
     public function show($id)
     {
-        $data['complaint'] = Complaint::joinUser()->joinPosition()
-                            ->select('complaints.*', 'users.name as user_name', 'positions.name as position_name')
-                            ->find($id);
-        $data['complaint']['comments'] = Comment::joinUser()->select('comments.*', 'users.name as user_name', 'users.role_id as user_role')
-                                            ->where('complaint_id', $id)
-                                            ->orderBy('id', 'asc')
-                                            ->get();
+        $complaint = Complaint::with('comments', 'position', 'users')->find($id);
+        $complaint->user_name = $complaint->users->name;
+        $complaint->position_name = $complaint->position->name;
+        $complaint->comments->map(function($comment) use($complaint) {
+            $comment->setAttribute('user_name', ($comment->user_id) ? $comment->user->name : '-');
+            $comment->setAttribute('position_id', $complaint->position_id);
+            $comment->setAttribute('position_name', $complaint->position->name);
+            $comment->setAttribute('user_role', $complaint->users->role_id);
+            unset($comment->updated_at);
+            unset($comment->user);
+        });
+        unset($complaint->users);
+        unset($complaint->position);
+        
+        $data['complaint'] = $complaint;
         $data['positions'] = Position::all();
         return view('admin.complaint.show', compact('data'));
     }
@@ -58,6 +66,7 @@ class ComplaintController extends Controller
                 $comment->complaint_id = $complaint->id;
                 $comment->body = $request->message;
                 $comment->status = "Diteruskan";
+                $comment->from_role = "Admin";
 
                 $comment->save();
                 return redirect()->back()->with('success', 'Pengaduan berhasil diteruskan');
