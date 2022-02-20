@@ -32,12 +32,22 @@ class UserController extends Controller
     {
         $data['user'] = User::findOrFail($id);
 
-        $data['user']->setRelation('complaints', $data['user']->complaints()->joinPosition()
-                    ->paginate($perPage = 2, $columns = ['*'], $pageName = 'pg_cp')->withQueryString()
+        $data['user']->setRelation('complaints', 
+            $data['user']
+                ->complaints()
+                ->paginate(10, ['*'], 'pg_cp')
+                ->withQueryString()
         );
 
-        $data['user']->setRelation('comments', $data['user']->comments()->paginate(
-            $perPage = 5, $columns = ['*'], $pageName = 'pg_cm')->withQueryString()
+        $data['user']->complaints->map(function($complaint) {
+            $complaint->setAttribute('position_name', $complaint->position->name);
+        });
+
+        $data['user']->setRelation('comments', 
+            $data['user']
+                ->comments()
+                ->paginate(10, ['*'], 'pg_cm')
+                ->withQueryString()
         );
         
         $data['positions'] = Position::get()->filter(function ($position) {
@@ -47,8 +57,10 @@ class UserController extends Controller
         $data['position_complaints'] = null;
 
         if ($data['user']->role_id == 3) {
-            $data['position_complaints'] = Complaint::select('complaints.*')->position($data['user']->position->id)
-                                        ->paginate($perPage = 10, $columns = ['*'], $pageName = 'pg_pscp')->withQueryString();
+            $data['position_complaints'] = Complaint::select('complaints.*')
+                ->position($data['user']->position->id)
+                ->paginate(10, ['*'], 'pg_pscp')
+                ->withQueryString();
         }
 
         return view('admin.user.show', compact('data', 'requests'));

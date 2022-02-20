@@ -147,6 +147,7 @@
                                                 <th>Komentar</th>
                                                 <th>Status</th>
                                                 <th>Waktu</th>
+                                                <th>Aksi</th>
                                             </tr>
                                         </thead>
                                         <tfoot>
@@ -156,6 +157,7 @@
                                                 <th>Komentar</th>
                                                 <th>Status</th>
                                                 <th>Waktu</th>
+                                                <th>Aksi</th>
                                             </tr>
                                         </tfoot>
                                         <tbody>
@@ -170,9 +172,9 @@
                                                     @endif
                                                 </td>
                                                 <td>
-                                                    @if ($comment->user_role == '1')
+                                                    @if ($comment->from_role == 'Admin')
                                                     <span class="badge badge-primary">Admin</span>
-                                                    @elseif ($comment->user_role == '2')
+                                                    @elseif ($comment->from_role == 'Pengadu')
                                                     <span class="badge badge-success">Pengadu</span>
                                                     @else
                                                     <span class="badge badge-warning">Staff</span>
@@ -193,6 +195,11 @@
                                                 </td>
                                                 <td>
                                                     @livewire('convert-date-indo', ['date' => $comment->created_at ])
+                                                </td>
+                                                <td class="text-center">
+                                                    <a href="{{ url('admin/complaint/'.$comment->complaint_id) }}" class="btn btn-info btn-sm mb-1">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
                                                 </td>
                                             </tr>
                                             @endforeach
