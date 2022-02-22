@@ -11,11 +11,6 @@ use Illuminate\Support\Str;
 
 class ComplaintController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index(Request $request)
     {   
         try {
@@ -30,7 +25,6 @@ class ComplaintController extends Controller
             $complaints->map(function ($complaint) {
                 $complaint->setAttribute('username', (!$complaint->anonymous) ? 'Anonymous' : $complaint->users->name); //TODO: Nanti tolong di cek apakah gak terbalik yg anonymous
                 $complaint->setAttribute('comments_count', $complaint->comments->count());
-                
                 unset($complaint->comments);
                 unset($complaint->users);
                 unset($complaint->is_anonymous);
@@ -45,22 +39,18 @@ class ComplaintController extends Controller
                 'message' => 'SUCCESS',
                 'status' => '200',
                 'data' => $complaints,
+                'errors' => null,
             ], 200);
+
         } catch (QueryException $e) {
             return response()->json([
                 'status' => '500',
                 'message' => 'ERROR',
-                'data' => $e->getMessage(),
+                'data' => null,
+                'errors' => 'Internal Server Error',
             ], 500);
         }
     }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     
     public function store(Request $request) {
         $complaint = $request->all();
@@ -70,7 +60,6 @@ class ComplaintController extends Controller
             if ($request->hasFile('image')) {
 
                 $file = $request->file('image');
-
                 $date = date('Ymd').'_'.date('His');
                 $filename = $date . '_' . random_int(1000, 9999) . '.' . $file->getClientOriginalExtension();
                 $destinationPath = "storage/complaint/";
@@ -107,83 +96,54 @@ class ComplaintController extends Controller
         ], 401);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    // TODO: Benerin ini
     public function show($id)
     {
-        function getNameByRole($user){
-            if ($user->role_id = 1) {
-                return 'Admin';
-            } else if ($user->role_id = 3) {
-                return $user->position->name;
-            } else {
-                return $user->name;
+        try {
+            $complaint = Complaint::with('comments', 'users')->where('id', $id)->first();
+            if (!$complaint){
+                return response()->json([
+                    'status' => 404,
+                    'message' => 'NOT_FOUND',
+                    'data' => null,
+                    'errors' => [
+                        'message' => 'Data not found',
+                    ],
+                ], 404);
             }
-        } 
 
-        $complaint = Complaint::with('comments')->find($id);
+            $complaint->setAttribute('username', (!$complaint->anonymous) ? 'Anonymous' : $complaint->users->name); 
+            $complaint->position_name = $complaint->position->name;
+            $complaint->comments->map(function ($comment) use ($complaint) {  
+                $comment->setAttribute('name', $this->getNameByRole($comment->user));
+                $comment->setAttribute('position', $complaint->position->name);
+                unset($comment->user);
+                unset($comment->updated_at);
+            });
+            unset($complaint->updated_at);
+            unset($complaint->users);
+            unset($complaint->position);
 
-        $complaint->comments->map(function ($comment) use ($complaint) {  
-            // return [
-            //     'id' => $comment->id,
-            //     'complaint_id' => $comment->complaint_id,
-            //     'user_id' => $comment->user_id,
-            //     'body' => $comment->body,
-            //     'status' => $comment->status,
-            //     'name' => getNameByRole($comment->user),
-            //     'created_at' => $comment->created_at,
-            //     'created_at_human' => $comment->created_at->diffForHumans(),
-            //     'position' => $complaint->position->name,
-            // ];
-            $comment->setAttribute('name', getNameByRole($comment->user));
-            $comment->setAttribute('position', $complaint->position->name);
-            unset($comment->user);
-        });
-
-        if ($complaint) {
             return response()->json([
-                'status' => 200,
+                'status' => '200',
                 'message' => 'SUCCESS',
                 'data' => $complaint,
-                'error' => null,
+                'errors' => null,
             ], 200);
+        } catch (QueryException $e) {
+            return response()->json([
+                'status' => '500',
+                'message' => 'ERROR',
+                'data' => null,
+                'errors' => 'Internal Server Error',
+            ], 500);
         }
-
-        return response()->json([
-            'status' => 404,
-            'message' => 'NOT_FOUND',
-            'data' => null,
-            'errors' => [
-                'message' => 'Data not found',
-            ],
-        ], 404);
     }
 
-    
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function edit($id)
     {
         
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
     {    
         $complaint = $request->all();
@@ -234,12 +194,6 @@ class ComplaintController extends Controller
         ], 401);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
         try {
@@ -269,5 +223,15 @@ class ComplaintController extends Controller
             ], 500);
         }
     }
+
+    protected function getNameByRole($user){
+        if ($user->role_id = 1) {
+            return 'Admin';
+        } else if ($user->role_id = 3) {
+            return $user->position->name;
+        } else {
+            return $user->name;
+        }
+    } 
     
 }
