@@ -10,11 +10,7 @@ use Illuminate\Support\Facades\Validator;
 
 class ComplaintController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+
     public function index()
     {   
         try {
@@ -45,13 +41,6 @@ class ComplaintController extends Controller
         }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    
     public function store(Request $request) {
         $complaint = $request->all();
         $validator = Validator::make($complaint, Complaint::$rules);
@@ -97,12 +86,6 @@ class ComplaintController extends Controller
         ], 401);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function show($id)
     {  
         $complaint = Complaint::with('user', 'position', 'comments')
@@ -127,24 +110,11 @@ class ComplaintController extends Controller
         ], 404);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function edit($id)
     {
         
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
     {    
         $complaint = $request->all();
@@ -195,12 +165,6 @@ class ComplaintController extends Controller
         ], 401);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
         try {

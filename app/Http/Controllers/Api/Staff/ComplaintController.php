@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Api\Staff;
 
 use App\Http\Controllers\Controller;
+use App\Models\Comment;
 use App\Models\Complaint;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
 
 class ComplaintController extends Controller
 {
@@ -50,50 +50,6 @@ class ComplaintController extends Controller
                 'errors' => 'Internal Server Error',
             ], 500);
         }
-    }
-    
-    public function store(Request $request) {
-        $complaint = $request->all();
-        $validator = Validator::make($complaint, Complaint::$rules);
-
-        if (!$validator->fails()) {
-            if ($request->hasFile('image')) {
-
-                $file = $request->file('image');
-                $date = date('Ymd').'_'.date('His');
-                $filename = $date . '_' . random_int(1000, 9999) . '.' . $file->getClientOriginalExtension();
-                $destinationPath = "storage/complaint/";
-                $file->move($destinationPath, $filename);
-                $complaint['image'] = url('/') . '/' . $destinationPath . $filename;
-            }
-
-            $complaint['message_status'] = 1 ;
-
-            if(Complaint::create($complaint)){
-                return response()->json([
-                    'status' => 200,
-                    'message' => 'SUCCESS',
-                    'data' => $complaint,
-                    'error' => null,
-                ], 200);
-            } 
-
-            return response()->json([
-                'status' => 500,
-                'message' => 'FAILED',
-                'data' => $complaint,
-                'errors' => [
-                    'message' => 'Internal Server Error',
-                ],
-            ], 500);
-        }
-
-        return response()->json([
-            'message' => 'VALIDATION_ERROR',
-            'status' => '401',
-            'data' => null,
-            'errors' => $validator->errors(),
-        ], 401);
     }
 
     public function show($id)
@@ -139,99 +95,105 @@ class ComplaintController extends Controller
         }
     }
 
-    public function edit($id)
-    {
-        
-    }
-
-    public function update(Request $request, $id)
-    {    
-        $complaint = $request->all();
-        $validator = Validator::make($complaint, Complaint::$rules);
-
-        if (!$validator->fails()) {
-
-            try {
-                $complaint = Complaint::find($id);
-
-                if ($request->hasFile('image')) {
-                    $file = $request->file('image');
-                    $date = date('Ymd').'_'.date('His');
-                    $filename = $date . '_' . random_int(1000, 9999) . '.' . $file->getClientOriginalExtension();
-                    $destinationPath = "storage/complaint/";
-                    $file->move($destinationPath, $filename);
-                    $complaint['image'] = url('/') . '/' . $destinationPath . $filename;
-                }
-    
-                if($complaint->update($complaint)){
-                    return response()->json([
-                        'status' => 200,
-                        'message' => 'SUCCESS',
-                        'data' => $complaint,
-                        'error' => null,
-                    ], 200);
-                } 
-
-            } catch (QueryException $q) {
-                if (!$complaint) {
-                    return response()->json([
-                        'status' => 404,
-                        'message' => 'NOT_FOUND',
-                        'data' => null,
-                        'errors' => [
-                            'message' => $q->getMessage(),
-                        ],
-                    ], 404);
-                }
-            }
-        }
-
-        return response()->json([
-            'message' => 'VALIDATION_ERROR',
-            'status' => '401',
-            'data' => null,
-            'errors' => $validator->errors(),
-        ], 401);
-    }
-
-    public function destroy($id)
+    public function confirm(Request $request, $id)
     {
         try {
-            $complaint = Complaint::find($id);
-            if ($complaint) {
-                $complaint->delete();
+            $requests = $request->all();
+            $validator = Validator::make($requests, [
+                'status' => 'required|in:Diterima,Ditolak',
+                'body' => 'required|string',
+            ]); 
+            
+            if ($validator->fails()) {
                 return response()->json([
-                    'status' => 200,
-                    'message' => 'SUCCESS',
+                    'message' => 'VALIDATION_ERROR',
+                    'status' => '401',
                     'data' => null,
-                    'error' => null,
-                ], 200);
+                    'errors' => $validator->errors(),
+                ], 401);
             }
-            return response()->json([
-                'status' => 404,
-                'message' => 'NOT_FOUND',
-                'data' => null,
-                'errors' => [
-                    'message' => 'Data not found',
-                ],
-            ], 404);    
+
+            $complaint = Complaint::find($id);
+
+            if(!$complaint){
+                return response()->json([
+                    'status' => 404,
+                    'message' => 'NOT_FOUND',
+                    'data' => null,
+                    'errors' => [
+                        'message' => 'Data not found',
+                    ],
+                ], 404);
+            }
+
+            if($complaint->status == 'Diteruskan'){
+                if ($complaint->position_id != $request->user()->position_id){
+                    return response()->json([
+                        'status' => 403,
+                        'message' => 'FORBIDDEN',
+                        'data' => null,
+                        'errors' => [
+                            'message' => 'Forbidden',
+                        ],
+                    ], 403);
+                }
+                $comment = new Comment;
+                $comment->user_id = $request->user()->id;
+                $comment->complaint_id = $complaint->id;
+                $comment->body = $request->body;
+                $comment->status = $request->status;
+                $comment->from_role = 'staff';
+                $comment->save();
+                $complaint->status = $request->status;
+                $complaint->update();
+
+                $complaint->setAttribute('username', (!$complaint->anonymous) ? 'Anonymous' : $complaint->users->name); 
+                $complaint->position_name = $complaint->position->name;
+                $complaint->comments->map(function ($comment) use ($complaint) {  
+                    $comment->setAttribute('user_name', $this->getNameByRole($comment->user)); //TODO: Cek ini kenapa retunnya selalu admine
+                    $comment->setAttribute('position_name', $complaint->position->name);
+                    unset($comment->user);
+                    unset($comment->updated_at);
+                });
+                unset($complaint->updated_at);
+                unset($complaint->users);
+                unset($complaint->position);
+
+                return response()->json([
+                    'status' => '200',
+                    'message' => 'SUCCESsS',
+                    'data' => $complaint,
+                    'errors' => null,
+                ], 200);
+            } else {
+                return response()->json([
+                    'status' => '400',
+                    'message' => 'BAD_REQUEST',
+                    'errors' => [
+                        'message' => 'Bad Request',
+                    ],
+                ], 400);
+            }
+
+            
         } catch (QueryException $e) {
             return response()->json([
-                'status' => 500,
+                'status' => '500',
                 'message' => 'ERROR',
-                'data' => $e->getMessage(),
+                'errors' => 'Internal Server Error',
             ], 500);
         }
     }
 
-    protected function getNameByRole($user){
-        if ($user->role_id = 1) {
+    protected function getNameByRole($user) 
+    {
+        if ($user->role_id == 1) {
             return 'Admin';
-        } else if ($user->role_id = 3) {
+        } else if ($user->role_id == 3) {
             return $user->position->name;
         } else {
             return $user->name;
         }
     } 
-    
+ 
 }

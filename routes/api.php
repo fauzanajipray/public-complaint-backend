@@ -26,9 +26,9 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     
     // make route group prefix staff
     Route::group(['prefix' => 'staff', 'middleware' => 'role.api:staff'], function () {
-        Route::resource('complaints', StaffComplaintController::class);
+        Route::resource('complaints', StaffComplaintController::class)->only(['index', 'show']);
+        Route::post('complaints/{id}/confirm', StaffComplaintController::class.'@confirm');
     });
-
 });
 
 Route::post('login', [AuthController::class, 'login']);

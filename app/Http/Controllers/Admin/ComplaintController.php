@@ -35,7 +35,7 @@ class ComplaintController extends Controller
 
     public function show($id)
     {
-        $complaint = Complaint::with('comments', 'position', 'users')->find($id);
+        $complaint = Complaint::with('comments', 'position', 'users')->findOrFail($id);
         $complaint->user_name = $complaint->users->name;
         $complaint->position_name = $complaint->position->name;
         $complaint->comments->map(function($comment) use($complaint) {
