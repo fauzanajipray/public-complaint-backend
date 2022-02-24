@@ -88,26 +88,45 @@ class ComplaintController extends Controller
 
     public function show($id)
     {  
-        $complaint = Complaint::with('user', 'position', 'comments')
-                                ->find($id);
+        try {
+            $complaint = Complaint::with('comments', 'users')->where('id', $id)->first();
+            if (!$complaint){
+                return response()->json([
+                    'status' => 404,
+                    'message' => 'NOT_FOUND',
+                    'data' => null,
+                    'errors' => [
+                        'message' => 'Data not found',
+                    ],
+                ], 404);
+            }
 
-        if ($complaint) {
+            $complaint->setAttribute('username', (!$complaint->anonymous) ? 'Anonymous' : $complaint->users->name); 
+            $complaint->position_name = $complaint->position->name;
+            $complaint->comments->map(function ($comment) use ($complaint) {  
+                $comment->setAttribute('name', $this->getNameByRole($comment->user));
+                $comment->setAttribute('position', $complaint->position->name);
+                unset($comment->user);
+                unset($comment->updated_at);
+            });
+            unset($complaint->updated_at);
+            unset($complaint->users);
+            unset($complaint->position);
+
             return response()->json([
-                'status' => 200,
+                'status' => '200',
                 'message' => 'SUCCESS',
                 'data' => $complaint,
-                'error' => null,
+                'errors' => null,
             ], 200);
+        } catch (QueryException $e) {
+            return response()->json([
+                'status' => '500',
+                'message' => 'ERROR',
+                'data' => null,
+                'errors' => 'Internal Server Error',
+            ], 500);
         }
-
-        return response()->json([
-            'status' => 404,
-            'message' => 'NOT_FOUND',
-            'data' => null,
-            'errors' => [
-                'message' => 'Data not found',
-            ],
-        ], 404);
     }
 
     public function edit($id)
@@ -225,4 +244,15 @@ class ComplaintController extends Controller
             ], 500);
         }
     }
+
+    protected function getNameByRole($user) 
+    {
+        if ($user->role_id == 1) {
+            return 'Admin';
+        } else if ($user->role_id == 3) {
+            return $user->position->name;
+        } else {
+            return $user->name;
+        }
+    } 
 }
