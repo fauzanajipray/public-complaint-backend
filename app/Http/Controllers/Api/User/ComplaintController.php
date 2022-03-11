@@ -14,13 +14,29 @@ class ComplaintController extends Controller
     public function index()
     {   
         try {
-            $complaints = Complaint::private()->anonymous()
-                            ->userId()
-                            ->search()
-                            ->status()
-                            ->with('comments')
-                            ->paginate(20)
-                            ->withQueryString();
+            $complaints = Complaint::private()
+                ->anonymous()
+                ->search()
+                ->userId()
+                ->status()
+                ->with('comments')
+                ->paginate(20)
+                ->withQueryString();
+
+            $complaints->map(function ($complaint) {
+                $complaint->setAttribute('user_name', ($complaint->is_anonymous == 1) ? 'Anonymous' : $complaint->users->name); //TODO: Nanti tolong di cek apakah gak terbalik yg anonymous
+                $complaint->setAttribute('user_image', ($complaint->is_anonymous == 1) ? null : $complaint->users->detail->avatar);
+                $complaint->position_name = $complaint->position->name;
+                $complaint->setAttribute('comments_count', $complaint->comments->count());
+                unset($complaint->comments);
+                unset($complaint->users);
+                unset($complaint->is_anonymous);
+                unset($complaint->is_private);
+                unset($complaint->position_id);
+                unset($complaint->updated_at);
+                unset($complaint->position);
+                return $complaint;
+            });
 
             return response()->json([
                 'message' => 'SUCCESS',

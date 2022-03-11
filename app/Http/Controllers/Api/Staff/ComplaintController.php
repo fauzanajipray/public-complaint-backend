@@ -14,7 +14,7 @@ class ComplaintController extends Controller
     public function index(Request $request)
     {   
         try {
-            $complaints = Complaint::with('comments', 'users')->where('position_id' , $request->user()->position_id)
+            $complaints = Complaint::where('position_id' , $request->user()->position_id)
                 ->orderByDate()
                 ->status()
                 ->search()
@@ -23,15 +23,17 @@ class ComplaintController extends Controller
                 ->withQueryString();
             
             $complaints->map(function ($complaint) {
-                $complaint->setAttribute('username', (!$complaint->anonymous) ? 'Anonymous' : $complaint->users->name); //TODO: Nanti tolong di cek apakah gak terbalik yg anonymous
+                $complaint->setAttribute('user_name', ($complaint->is_anonymous == 1) ? 'Anonymous' : $complaint->users->name); //TODO: Nanti tolong di cek apakah gak terbalik yg anonymous
+                $complaint->setAttribute('user_image', ($complaint->is_anonymous == 1) ? null : $complaint->users->detail->avatar);
+                $complaint->position_name = $complaint->position->name;
                 $complaint->setAttribute('comments_count', $complaint->comments->count());
                 unset($complaint->comments);
                 unset($complaint->users);
                 unset($complaint->is_anonymous);
                 unset($complaint->is_private);
-                unset($complaint->user_id);
                 unset($complaint->position_id);
                 unset($complaint->updated_at);
+                unset($complaint->position);
                 return $complaint;
             });
 
