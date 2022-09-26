@@ -12,7 +12,7 @@ return [
     |
     */
 
-    'unauthorized' => 'Kamu tidak mimiliki akases untuk mengakses sumber daya ini.',
+    'unauthorized' => 'Kamu tidak mimiliki akses untuk mengakses sumber daya ini.',
     'failed'   => 'Identitas tersebut tidak cocok dengan data kami.',
     'password' => 'Kata sandi yang diberikan salah.',
     'throttle' => 'Terlalu banyak usaha masuk. Silahkan coba lagi dalam :seconds detik.',
@@ -23,6 +23,8 @@ return [
     'register.verify.failed' => 'Akun gagal diverifikasi. Silakan coba lagi.',
     'register.verify.expired' => 'Verifikasi akun telah kadaluarsa. Silakan coba lagi.',
     'register.verify.invalid' => 'Verifikasi akun tidak valid. Silakan coba lagi.',
+    'register.resend.success' => 'Kode verifikasi berhasil dikirim.',
+    'register.resend.failed' => 'Kode verifikasi gagal dikirim. Silakan coba lagi.',
     
     'login.success' => 'Selamat datang :name!',
     'login.failed' => 'Identitas tersebut tidak cocok dengan data kami.',

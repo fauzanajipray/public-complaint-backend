@@ -21,6 +21,8 @@ class CreateUsersTable extends Migration
             $table->tinyInteger('is_email_verified')->default(2); // 1 = verified, 2 = not verified            
             $table->timestamp('email_verified_at')->nullable();
             // $table->rememberToken();
+            $table->integer('otp')->nullable();
+            $table->timestamp('otp_expired_at')->nullable();
             $table->timestamps();
         });
     }

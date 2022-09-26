@@ -25,7 +25,7 @@ class Complaint extends Model
         'title' => 'required|string|max:255',
         'description' => 'required|string',
         'position_id' => 'required|integer',
-        'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        'image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         'status' => 'string|max:255|in:Menunggu,Diteruskan,Diterima,Ditolak',
         'is_anonymous' => 'required|boolean',
         'is_private' => 'required|boolean',

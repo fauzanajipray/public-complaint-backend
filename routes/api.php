@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\Public\PositionController as PublicPositionController;
 use App\Http\Controllers\Api\User\ComplaintController as UserComplaintController;
 use App\Http\Controllers\Api\Staff\ComplaintController as StaffComplaintController;
 use Illuminate\Support\Facades\Route;
@@ -15,6 +16,8 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+
+
 Route::group(['middleware' => 'auth:sanctum'], function () {
 
     Route::get('logout', [AuthController::class, 'logout']);
@@ -31,6 +34,11 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     });
 });
 
+// AUTH
 Route::post('login', [AuthController::class, 'login']);
+Route::post('register', [AuthController::class, 'register']); // old route
+Route::post('registerRequestOTP', [AuthController::class, 'postRegisterRequestOTP']);
+Route::post('registerResendOTP', [AuthController::class, 'postRegisterResendOTP']);
 
-Route::post('register', [AuthController::class, 'register']);
+
+Route::get('positions', [PublicPositionController::class, 'index']);

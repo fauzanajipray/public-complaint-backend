@@ -10,11 +10,25 @@ use Illuminate\Support\Facades\Validator;
 
 class ComplaintController extends Controller
 {
+    private function changeNameImage($imageUrl){
+        // $imageUrlExplode = explode('/', $imageUrl);
+        // $imageName = $imageUrlExplode[count($imageUrlExplode)-1];
+        // $fullUrl = 'https://68aa-45-126-187-15.ngrok.io'.'/storage/complaint/'.$imageName;
+        // if(isset($imageUrlExplode[2])){
+        //     if ($imageUrlExplode[2] == 'via.placeholder.com'){
+        //         return $imageUrl;
+        //     }
+        // }
+        // else {
+        //     return $fullUrl;
+        // }
+    }
 
     public function index()
     {   
         try {
             $complaints = Complaint::private()
+                ->orderByDate()
                 ->anonymous()
                 ->search()
                 ->userId()
@@ -28,6 +42,7 @@ class ComplaintController extends Controller
                 $complaint->setAttribute('user_image', ($complaint->is_anonymous == 1) ? null : $complaint->users->detail->avatar);
                 $complaint->position_name = $complaint->position->name;
                 $complaint->setAttribute('comments_count', $complaint->comments->count());
+                // $complaint->setAttribute('image', $this->changeNameImage($complaint->image));
                 unset($complaint->comments);
                 unset($complaint->users);
                 unset($complaint->is_anonymous);
@@ -37,7 +52,6 @@ class ComplaintController extends Controller
                 unset($complaint->position);
                 return $complaint;
             });
-
             return response()->json([
                 'message' => 'SUCCESS',
                 'status' => '200',
@@ -116,7 +130,7 @@ class ComplaintController extends Controller
                     ],
                 ], 404);
             }
-
+            // $complaint->setAttribute('image', $this->changeNameImage($complaint->image));
             $complaint->setAttribute('username', (!$complaint->anonymous) ? 'Anonymous' : $complaint->users->name); 
             $complaint->position_name = $complaint->position->name;
             $complaint->comments->map(function ($comment) use ($complaint) {  
@@ -128,7 +142,7 @@ class ComplaintController extends Controller
             unset($complaint->updated_at);
             unset($complaint->users);
             unset($complaint->position);
-
+            
             return response()->json([
                 'status' => '200',
                 'message' => 'SUCCESS',

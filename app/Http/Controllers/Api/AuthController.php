@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\UserDetail;
 use App\Models\UserVerify;
+use App\Repositories\UserRepository;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -17,6 +18,12 @@ use Illuminate\Validation\Rule;
 class AuthController extends Controller
 {
 
+    protected $userRepository;
+
+    public function __construct()
+    {
+        $this->userRepository = new UserRepository();
+    }
     public function login(Request $request){
 
         $validator = Validator::make($request->all(), [
@@ -125,12 +132,140 @@ class AuthController extends Controller
                 ], 200);
             }
         }
-
         return response()->json([
             'status' => 401,
-            'message' => __('auth.failed'),
-            'errors' => $validator->errors()
+            'message' => "Vadlidasi error",
+            'errors' => $validator->errors()->all()
         ], 401);
 
     }
+
+    public function postRegisterRequestOTP(Request $request){
+        $requests = $request->all();
+        $validator = Validator::make($requests, [
+            'name' => ['required', 'string', 'max:255'],
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:255',
+                Rule::unique(User::class),
+            ],
+            'password' => ['required', 'string', new Password],
+        ]);        
+        try {
+            if (!$validator->fails()) {
+                $requests['password'] = Hash::make($requests['password']);
+                $requests['role_id'] = 2;
+                $user = $this->userRepository->create($requests);
+                $user = $this->userRepository->requestOtp($user);
+                return response()->json([
+                    'status' => 200,
+                    'message' => __('auth.register.success'),
+                    'user' => $user,
+                    'errors' => null
+                ], 200);
+            }
+            return response()->json([
+                'status' => 401,
+                'message' => "Vadlidasi error",
+                'errors' => $validator->errors()->all()
+            ], 401);
+        } catch (\Exception $e) {
+            dd($e);
+            return response()->json([
+                'status' => 500,
+                'message' => __('httpresponse.500'),
+                'errors' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function postRegisterVerifyOTP(Request $request){
+        $requests = $request->all();
+        $validator = Validator::make($requests, [
+            'otp' => ['required', 'string', 'max:4'],
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:255',
+                Rule::exists(User::class),
+            ],
+        ]);
+        
+        if($validator->fails()){
+            return response()->json([
+                'status' => 401,
+                'message' => "Validasi error",
+                'errors' => $validator->errors()->all()
+            ], 401);
+        }
+        try {
+            $user = $this->userRepository->verifyOTP($requests['email'], $requests['otp']);
+            if ($user) {
+                return response()->json([
+                    'status' => 200,
+                    'message' => __('auth.register.verify.success'),
+                    'user' => $user,
+                    'errors' => null
+                ], 200);
+            }
+            return response()->json([
+                'status' => 401,
+                'message' => __('auth.register.verify.failed'),
+                'errors' => null
+            ], 401);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 500,
+                'message' => __('httpresponse.500'),
+                'errors' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function postRegisterResendOTP(Request $request){
+        $requests = $request->all();
+        $validator = Validator::make($requests, [
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:255',
+                Rule::exists(User::class),
+            ],
+        ]);
+        if($validator->fails()){
+            return response()->json([
+                'status' => 401,
+                'message' => "Validasi error",
+                'errors' => $validator->errors()->all()
+            ], 401);
+        }
+        try {
+            $user = $this->userRepository->resendOTP($requests['email']);
+            if ($user) {
+                return response()->json([
+                    'status' => 200,
+                    'message' => __('auth.register.resend.success'),
+                    'errors' => null
+                ], 200);
+            }
+            return response()->json([
+                'status' => 401,
+                'message' => __('auth.register.resend.failed'),
+                'errors' => null
+            ], 401);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 500,
+                'message' => __('httpresponse.500'),
+                'errors' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    
+    
 }

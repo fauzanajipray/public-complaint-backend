@@ -27,4 +27,7 @@ return [
     'reset.password.signature' => 'Terima kasih,',
     'reset.password.signature.name' => 'Tim :app_name',
 
+    'otp.subject' => 'Permintaan OTP',
+    'welcome.subject' => 'Selamat Datang di :app_name',
+
 ];

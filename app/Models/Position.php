@@ -14,6 +14,11 @@ class Position extends Model
         'description',
     ];
 
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+    ];
+
     public static $rules = [
         'name' => 'required|string|max:255|unique:positions',
     ];
@@ -27,5 +32,11 @@ class Position extends Model
     {
         return $this->hasMany(Complaint::class);
     }
+
+    // public function makeHidden($attributes)
+    // {
+    //     $this->fillable = array_diff($this->fillable, $attributes);
+    //     return $this;
+    // }
 
 }

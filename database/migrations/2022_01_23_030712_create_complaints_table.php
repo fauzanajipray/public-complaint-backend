@@ -19,7 +19,7 @@ class CreateComplaintsTable extends Migration
             $table->string('title');
             $table->string('description');
             $table->foreignId('position_id')->constrained()->onDelete('cascade');
-            $table->string('image');
+            $table->string('image')->nullable();
             $table->enum('status', ['Menunggu', 'Diteruskan', 'Diterima', 'Ditolak'])->default('Menunggu');
             $table->boolean('is_anonymous')->default(0);
             $table->boolean('is_private')->default(0);

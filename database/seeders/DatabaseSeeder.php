@@ -18,15 +18,16 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        Role::create(['name' => 'Admin']);
-        Role::create(['name' => 'User']);
-        Role::create(['name' => 'Staff']);
-        
-        Position::create(['name' => 'Kepala Desa']);
-        Position::create(['name' => 'Kepala Dusun Karangrejo']);
-        Position::create(['name' => 'Kepala Dusun Gondang Rejo']);
-        Position::create(['name' => 'Kepala Dusun Karangnongko']);
-        Position::create(['name' => 'Kepala Dusun Brangkal']);
+
+        Role::updateOrCreate([ 'id' => 1, ], [ 'name' => 'Admin' ]);
+        Role::updateOrCreate([ 'id' => 2, ], [ 'name' => 'User' ]);
+        Role::updateOrCreate([ 'id' => 3, ], [ 'name' => 'Staff' ]);
+
+        Position::updateOrCreate([ 'id' => 1, ],['name' => 'Kepala Desa']);
+        Position::updateOrCreate([ 'id' => 2, ],['name' => 'Kepala Dusun Karangrejo']);
+        Position::updateOrCreate([ 'id' => 3, ],['name' => 'Kepala Dusun Gondang Rejo']);
+        Position::updateOrCreate([ 'id' => 4, ],['name' => 'Kepala Dusun Karangnongko']);
+        Position::updateOrCreate([ 'id' => 5, ],['name' => 'Kepala Dusun Brangkal']);
         
         $user = User::factory(20)->create();
         $user->each(function ($u) {
