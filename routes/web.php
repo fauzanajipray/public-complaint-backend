@@ -1,11 +1,13 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminController;
-use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Admin\ComplaintController as AdminComplaintController;
 use App\Http\Controllers\Admin\PositionController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Api\Auth\AuthFacebookController;
+use App\Http\Controllers\Auth\AuthGoogleController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -24,6 +26,9 @@ Route::get('/', function () { return view('welcome'); });
 
 Route::get('register', [AuthController::class, 'register'])->name('register');
 Route::post('register', [AuthController::class, 'postRegister']);
+Route::get('register/otp-verification', [AuthController::class, 'registerOtpVerification'])->name('register.otp-verification');
+Route::post('register/otp-verification', [AuthController::class, 'postRegisterOtpVerification'])->name('register.otp-verification');
+Route::get('register/resend-otp', [AuthController::class, 'registerResendOtp'])->name('register.resend-otp');
 Route::get('login', [AuthController::class, 'login'])->name('login');
 Route::post('login', [AuthController::class, 'postLogin']);
 Route::post('logout', [AuthController::class, 'logout']);
@@ -53,3 +58,11 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'is_admin']
         ->only(['index', 'update']);
     
 });
+
+// Socialite Facebook
+// Route::get('login/facebook', [AuthFacebookController::class, 'redirect'])->name('login.facebook');
+// Route::get('login/facebook/callback', [AuthFacebookController::class, 'callback'])->name('login.facebook.callback');
+
+// Socialite Google
+Route::get('login/google', [AuthGoogleController::class, 'redirect'])->name('login.google');
+Route::get('login/google/callback', [AuthGoogleController::class, 'callback'])->name('login.google.callback');

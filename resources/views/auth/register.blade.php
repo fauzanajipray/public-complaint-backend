@@ -32,11 +32,11 @@
                             @csrf
                             <div class="form-group">
                                 <input type="text" class="form-control form-control-user" id="exampleFirstName"
-                                    placeholder="Name" name="name" required>
+                                    placeholder="Name" name="name" value="{{ old('name') }}" required>
                             </div>
                             <div class="form-group">
                                 <input type="email" class="form-control form-control-user" id="exampleInputEmail"
-                                    placeholder="Email Address" name="email" required>
+                                    placeholder="Email Address" name="email" value="{{ old('email') }}" required>
                             </div>
                             <div class="form-group row">
                                 <div class="col-sm-6 mb-3 mb-sm-0">
@@ -53,7 +53,7 @@
                             <a href="index.html" class="btn btn-google btn-user btn-block">
                                 <i class="fab fa-google fa-fw"></i> Register with Google
                             </a>
-                            <a href="index.html" class="btn btn-facebook btn-user btn-block">
+                            <a href="index.html" class="btn btn-facebook btn-user btn-block" hidden>
                                 <i class="fab fa-facebook-f fa-fw"></i> Register with Facebook
                             </a>
                         </form>

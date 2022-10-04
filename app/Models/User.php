@@ -23,7 +23,10 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'role_id',
         'position_id',
-        'is_email_verified'
+        'is_email_verified',
+        'otp',
+        'otp_expired_at',
+        'login_type',
     ];
 
     /**
@@ -70,6 +73,10 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function comments(){
         return $this->hasMany(Comment::class);
+    }
+
+    public function oauth(){
+        return $this->hasMany(UserOauth::class);
     }
 
     /**

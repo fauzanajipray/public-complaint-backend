@@ -23,7 +23,7 @@ class SendEmailService
 
     public function sendWelcome($email, $name)
     {
-        $subject = __('email.welcome.subject');
+        $subject = __('email.welcome.subject', ['app_name' => config('app.name')]);
         $view = 'email.welcome';
         $data = [ 'name' => $name ];
         $this->send($email, $subject, $view, $data);

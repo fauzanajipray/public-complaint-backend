@@ -1,11 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Auth;
 
 use App\Helpers\Rules\Password;
+use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\UserDetail;
 use App\Models\UserVerify;
+use App\Repositories\UserRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -16,14 +18,20 @@ use Illuminate\Support\Facades\Mail;
 
 class AuthController extends Controller
 {
+    protected $userRepository;
+
+    public function __construct()
+    {
+        $this->userRepository = new UserRepository();
+    }
+
     public function register(){
         return view('auth.register');
     }
 
     public function postRegister(Request $request){
-        
         $requests = $request->all();
-        Validator::make($requests, [
+        $validator = Validator::make($requests, [
             'name' => ['required', 'string', 'max:255'],
             'email' => [
                 'required',
@@ -33,33 +41,67 @@ class AuthController extends Controller
                 Rule::unique(User::class),
             ],
             'password' => ['required', 'string', new Password, 'confirmed'],
-        ])->validate();
-
-        $requests['password'] = Hash::make($requests['password']);
-        $requests['role_id'] = 2;
-
-        $user = User::create($requests);
-        if ($user) {
-
-            $token = Str::random(64);
-        
-            UserVerify::create([
-                'user_id' => $user->id, 
-                'token' => $token
-            ]);
-
-            UserDetail::create([
-                'user_id' => $user->id
-            ]);
-
-            Mail::send('email.emailVerificationEmail', ['token' => $token], function($message) use($request){
-                $message->to($request->email);
-                $message->subject('Email Verification Mail');
-            });
-
-            return redirect('login')->with('status', 'Anda perlu mengkonfirmasi akun Anda. Kami telah mengirimkan kode aktivasi, silakan periksa email Anda!');
+        ]);
+        try {
+            if(!$validator->fails()){
+                $requests['password'] = Hash::make($requests['password']);
+                $requests['role_id'] = 2;
+                $user = $this->userRepository->create($requests);
+                $user = $this->userRepository->requestOtp($user);
+                return redirect()->route('register.otp-verification', [
+                    'email' => $user->email,
+                ])->with('status', __('auth.register.success'));
+            } else {
+                return redirect()->back()->withInput()->withErrors($validator);
+            }
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', __('auth.register.failed'));
         }
-        return redirect('register')->with('status', 'Gagal mendaftar!');
+    }
+
+    public function registerOtpVerification(Request $request){
+        $user = $this->userRepository->findByEmail($request->email);
+        if($user){
+            return view('auth.otp-verification', compact('user'));
+        } else {
+            return redirect()->route('register')->with('error', __('auth.register.failed'));
+        }
+    }
+
+    public function postRegisterOtpVerification(Request $request){
+        $validator = Validator::make($request->all(), [
+            'otp' => ['required', 'string', 'max:4'],
+            'email' => ['required', 'string', 'email', 'max:255'],
+        ]);
+
+        try {
+            if(!$validator->fails()){
+                $user = $this->userRepository->verifyOtp($request->email, $request->otp);
+                if($user){
+                    return redirect()->route('login')->with('status', __('auth.register.verify.success'));
+                } else {
+                    return redirect()->route('register.otp-verification', [
+                        'email' => $request->email,
+                    ])->with('status', __('auth.register.verify.failed'));
+                }
+            } else {
+                return redirect()->back()->withInput()->withErrors($validator);
+            }
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', __('auth.register.verify.failed'));
+        }
+    }
+
+    public function registerResendOtp(Request $request){
+        $user = $this->userRepository->findByEmail($request->email);
+        if($user){
+            $user = $this->userRepository->requestOtp($user);
+            return redirect()->route('register.otp-verification', [
+                'email' => $user->email,
+            ])->with('status', __('auth.register.resend.success'));
+        } else {
+            return redirect()->route('register')->with('error', __('auth.register.resend.failed'));
+        }
     }
 
     public function login(){
@@ -67,7 +109,6 @@ class AuthController extends Controller
     }
 
     public function postLogin(Request $request){
-        
         $requests   = $request->all();
         $data       = User::where('email', $requests['email'])->first();
         if ($data) {
@@ -78,6 +119,7 @@ class AuthController extends Controller
                         Session::put('admin_name', $data->name);
                         Session::put('admin_email', $data->email);
                         Session::put('admin_role_id', $data->role_id);
+                        Session::put('admin_avatar', $data->detail->avatar);
                         return redirect('admin')->with('status', 'Selamat datang '.$data->name);
                     }
                     return redirect('login')->with('status', 'Anda tidak memiliki akses!');

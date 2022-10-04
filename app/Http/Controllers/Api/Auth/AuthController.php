@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\Auth;
 
 use App\Helpers\Rules\Password;
 use App\Http\Controllers\Controller;
@@ -24,6 +24,7 @@ class AuthController extends Controller
     {
         $this->userRepository = new UserRepository();
     }
+
     public function login(Request $request){
 
         $validator = Validator::make($request->all(), [
@@ -32,9 +33,7 @@ class AuthController extends Controller
         ]);
         
         if (!$validator->fails()){
-
             $user = User::where('email', $request->email)->first(); 
-
             if (!$user || !Hash::check($request->password, $user->password)) {
                 return response()->json([
                     'status' => 401,
@@ -44,7 +43,6 @@ class AuthController extends Controller
                     ]
                 ], 401);
             }
-
             if($user->is_email_verified == 0){
                 return response()->json([
                     'status' => 401,
@@ -52,9 +50,7 @@ class AuthController extends Controller
                     'errors' => null,
                 ], 401);
             }
-
-            $token = $user->createToken('token-name')->plainTextToken;
-
+            $token = $user->createToken('authToken')->plainTextToken;
             return response()->json([
                 'status' => 200,
                 'message' => __('auth.login.success', ['name' => $user->name]),
@@ -72,11 +68,8 @@ class AuthController extends Controller
     }
 
     public function logout(Request $request){
-
         $user = $request->user();
-
         $user->tokens()->delete();
-
         return response()->json([
             'status' => 200,
             'message' => __('auth.logout'),
@@ -100,23 +93,14 @@ class AuthController extends Controller
         ]);
 
         if (!$validator->fails()) {
-
             $requests['password'] = Hash::make($requests['password']);
             $requests['role_id'] = 2;
-
             $user = User::create($requests);
             if ($user) {
 
                 $token = Str::random(64);
-            
-                UserVerify::create([
-                    'user_id' => $user->id, 
-                    'token' => $token
-                ]);
-
-                UserDetail::create([
-                    'user_id' => $user->id
-                ]);
+                UserVerify::create(['user_id' => $user->id, 'token' => $token]);
+                UserDetail::create(['user_id' => $user->id]);
 
                 Mail::send('email.emailVerificationEmail', ['token' => $token], function($message) use($request){
                     $message->to($request->email);
@@ -172,7 +156,6 @@ class AuthController extends Controller
                 'errors' => $validator->errors()->all()
             ], 401);
         } catch (\Exception $e) {
-            dd($e);
             return response()->json([
                 'status' => 500,
                 'message' => __('httpresponse.500'),
@@ -204,10 +187,12 @@ class AuthController extends Controller
         try {
             $user = $this->userRepository->verifyOTP($requests['email'], $requests['otp']);
             if ($user) {
+                $token = $user->createToken('authToken')->plainTextToken;
                 return response()->json([
                     'status' => 200,
                     'message' => __('auth.register.verify.success'),
                     'user' => $user,
+                    'token' => $token,
                     'errors' => null
                 ], 200);
             }
@@ -265,7 +250,5 @@ class AuthController extends Controller
             ], 500);
         }
     }
-
-    
     
 }

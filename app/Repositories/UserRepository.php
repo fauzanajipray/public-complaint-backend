@@ -3,29 +3,31 @@
 namespace App\Repositories;
 
 use App\Models\User;
+use App\Models\UserDetail;
 use App\Services\SendEmailService;
 
 class UserRepository
 {
     protected $sendEmailService;
 
-    public function __construct()
-    {
+    public function __construct(){
         $this->sendEmailService = new SendEmailService();
     }
 
-    public function create($data)
-    {
-        return User::create($data);
+    public function create($data, $avatar = null){
+        $user =  User::create($data);
+        UserDetail::create([ 
+            'user_id' => $user->id,
+            'avatar' => $avatar, 
+        ]);
+        return $user;
     }
 
-    public function findByEmail($email)
-    {
+    public function findByEmail($email){
         return User::where('email', $email)->first();
     }
 
-    public function requestOtp($user)
-    {
+    public function requestOtp($user){
         $otpNumber = rand(1000, 9999);
         if ($user) {
             $user->otp = $otpNumber;
