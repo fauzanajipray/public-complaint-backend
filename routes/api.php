@@ -1,6 +1,8 @@
 <?php
 
-use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\Auth\AuthController;
+use App\Http\Controllers\Api\Auth\AuthFacebookController;
+use App\Http\Controllers\Api\Auth\AuthGoogleController;
 use App\Http\Controllers\Api\Public\PositionController as PublicPositionController;
 use App\Http\Controllers\Api\User\ComplaintController as UserComplaintController;
 use App\Http\Controllers\Api\Staff\ComplaintController as StaffComplaintController;
@@ -18,6 +20,8 @@ use Illuminate\Support\Facades\Route;
 */
 
 
+Route::get('positions', [PublicPositionController::class, 'index']);
+
 Route::group(['middleware' => 'auth:sanctum'], function () {
 
     Route::get('logout', [AuthController::class, 'logout']);
@@ -34,11 +38,12 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     });
 });
 
-// AUTH
+/** AUTH */
+
+// Email
 Route::post('login', [AuthController::class, 'login']);
 Route::post('register', [AuthController::class, 'register']); // old route
 Route::post('registerRequestOTP', [AuthController::class, 'postRegisterRequestOTP']);
 Route::post('registerResendOTP', [AuthController::class, 'postRegisterResendOTP']);
 
 
-Route::get('positions', [PublicPositionController::class, 'index']);

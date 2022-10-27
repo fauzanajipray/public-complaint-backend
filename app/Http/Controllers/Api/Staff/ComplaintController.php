@@ -27,15 +27,11 @@ class ComplaintController extends Controller
                 $complaint->setAttribute('user_image', ($complaint->is_anonymous == 1) ? null : $complaint->users->detail->avatar);
                 $complaint->position_name = $complaint->position->name;
                 $complaint->setAttribute('comments_count', $complaint->comments->count());
-                unset($complaint->comments);
-                unset($complaint->users);
-                unset($complaint->is_anonymous);
-                unset($complaint->is_private);
-                unset($complaint->position_id);
-                unset($complaint->updated_at);
-                unset($complaint->position);
                 return $complaint;
             });
+            $complaints->setCollection($complaints->getCollection()->makeHidden([
+                'comments', 'users', 'is_anonymous', 'is_private', 'position_id', 'updated_at', 'position'
+            ]));
 
             return response()->json([
                 'message' => 'SUCCESS',
