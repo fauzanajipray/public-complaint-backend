@@ -1,8 +1,5 @@
 # Public Complaint Android App
 
-This is an application I made to complete my thesis. The application will be used to handle complaints about problems 
-that exist in the village.
-
 
 <p align="center" style="margin-bottom: 0px !important;">
                                                         
